@@ -26,6 +26,8 @@ public class TrangChuServlet extends HttpServlet {
 
         // Gửi dữ liệu bàn sang file jsp để in ra màn hình
         request.setAttribute("danhSachBan", dsBan);
+        request.setAttribute("page_content", "so_do_ban.jsp");
+        request.setAttribute("active_tab", "sodo");
         request.getRequestDispatcher("main_ui.jsp").forward(request, response);
     }
 }

@@ -6,19 +6,6 @@ import java.util.ArrayList;
 public class CoffeeTable {
 
     private static List<CoffeeTable> danhSachBan = new ArrayList<>();
-
-    // Bơm dữ liệu giả lập vào ngay khi chương trình chạy
-    static {
-        danhSachBan.add(new CoffeeTable(1, "Bàn 1", "Tầng 1", "Trống"));
-        danhSachBan.add(new CoffeeTable(2, "Bàn 2", "Tầng 1", "Trống"));
-        danhSachBan.add(new CoffeeTable(3, "Bàn 3", "Tầng 2", "Trống"));
-        danhSachBan.add(new CoffeeTable(4, "Bàn 4", "Tầng 2", "Trống"));
-        danhSachBan.add(new CoffeeTable(5, "Bàn 5", "Sân vườn", "Trống"));
-        danhSachBan.add(new CoffeeTable(6, "Bàn 6", "Sân vườn", "Đang phục vụ"));
-        danhSachBan.add(new CoffeeTable(7, "Bàn 7", "Phòng lạnh", "Trống"));
-        danhSachBan.add(new CoffeeTable(8, "Bàn 8", "Phòng lạnh", "Trống"));
-    }
-
     private int tableId;
     private String tableName;
     private String area;

@@ -9,12 +9,6 @@ public class Category {
     private String description;
 
     private static List<Category> danhSachDanhMuc = new ArrayList<>();
-
-    static {
-        danhSachDanhMuc.add(new Category(1, "Ca phe", "Cac loai ca phe pha may"));
-        danhSachDanhMuc.add(new Category(2, "Tra", "Cac loai tra trai cay"));
-    }
-
     public Category() {}
 
     public Category(int categoryId, String categoryName, String description) {

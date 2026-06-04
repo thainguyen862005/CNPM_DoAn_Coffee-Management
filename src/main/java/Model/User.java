@@ -12,12 +12,6 @@ public class User {
 
     private static List<User> userList = new ArrayList<>();
 
-    static {
-        userList.add(new User(1, "admin", "123", "Manager"));
-        userList.add(new User(2, "staff1", "123", "Staff"));
-        userList.add(new User(3, "staff2", "123", "Staff"));
-    }
-
     public User() {}
 
     public User(int userId, String username, String password, String role) {

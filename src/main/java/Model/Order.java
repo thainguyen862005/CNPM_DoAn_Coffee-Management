@@ -13,11 +13,6 @@ public class Order {
 
     private static List<Order> danhSachHoaDon = new ArrayList<>();
 
-    static {
-        danhSachHoaDon.add(new Order(1, LocalDateTime.of(2026, 5, 1, 10, 30), "Đã thanh toán"));
-        danhSachHoaDon.add(new Order(2, LocalDateTime.now(), "Chưa thanh toán"));
-    }
-
     public Order() {}
 
     public Order(int orderId, LocalDateTime createdAt, String status) {

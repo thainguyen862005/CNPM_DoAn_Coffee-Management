@@ -35,23 +35,23 @@
     <div class="row">
         <div class="col-md-2 sidebar">
 
-            <a href="TrangChuServlet" class="${active_tab == 'sodo' ? 'active-tab' : ''}">
+            <a href="TrangChu" class="${active_tab == 'sodo' ? 'active-tab' : ''}">
                 <i class="fa fa-th-large"></i> Sơ Đồ Bàn
             </a>
 
-            <a href="QuanLyMenuServlet" class="${active_tab == 'menu' ? 'active-tab' : ''}">
+            <a href="QuanLyMenu" class="${active_tab == 'menu' ? 'active-tab' : ''}">
                 <i class="fa fa-coffee"></i> Quản Lý Thực Đơn
             </a>
 
-            <a href="HoaDonServlet" class="${active_tab == 'hoadon' ? 'active-tab' : ''}">
+            <a href="HoaDon" class="${active_tab == 'hoadon' ? 'active-tab' : ''}">
                 <i class="fa fa-file-text-o"></i> Hóa Đơn & Đặt Món
             </a>
 
             <c:if test="${sessionScope.role == 'Manager'}">
-                <a href="QuanLyNhanVienServlet" class="${active_tab == 'nhanvien' ? 'active-tab' : ''}">
+                <a href="QuanLyNhanVien" class="${active_tab == 'nhanvien' ? 'active-tab' : ''}">
                     <i class="fa fa-users"></i> Quản Lý Nhân Viên
                 </a>
-                <a href="BaoCaoServlet" class="${active_tab == 'baocao' ? 'active-tab' : ''}">
+                <a href="BaoCao" class="${active_tab == 'baocao' ? 'active-tab' : ''}">
                     <i class="fa fa-bar-chart"></i> Báo Cáo Doanh Thu
                 </a>
             </c:if>

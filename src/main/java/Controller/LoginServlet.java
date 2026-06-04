@@ -10,7 +10,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 
-@WebServlet("/LoginServlet")
+@WebServlet("/Login")
 public class LoginServlet extends HttpServlet {
 
     @Override
@@ -42,7 +42,7 @@ public class LoginServlet extends HttpServlet {
             session.setAttribute("userDaDangNhap", u);
             session.setAttribute("role", chucVu);
 
-            response.sendRedirect("TrangChuServlet");
+            response.sendRedirect("TrangChu");
         } else {
             // Sai thì báo lỗi đẩy về trang login
             request.setAttribute("thongBaoLoi", "Sai tên đăng nhập hoặc mật khẩu!");

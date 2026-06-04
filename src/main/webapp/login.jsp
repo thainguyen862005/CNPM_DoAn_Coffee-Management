@@ -3,7 +3,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Đăng nhập hệ thống - Đồ án NLU</title>
+    <title>Đăng nhập hệ thống - Hệ thống quản lý quán cà phê</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <style>
@@ -20,7 +20,7 @@
         <div class="card-body">
             <p style="color:red; text-align:center;">${thongBaoLoi}</p>
 
-            <form action="LoginServlet" method="POST">
+            <form action="Login" method="POST">
                 <div class="form-group">
                     <label><i class="fa fa-user"></i> Tên đăng nhập</label>
                     <input type="text" name="txtUsername" class="form-control" required>

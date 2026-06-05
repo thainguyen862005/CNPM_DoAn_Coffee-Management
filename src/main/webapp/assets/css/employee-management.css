@@ -1,0 +1,108 @@
+/*
+    UC-04 - Quản lý nhân viên
+
+    File CSS dùng cho:
+    - quan_ly_nhan_vien.jsp
+
+*/
+
+.content-wrapper {
+    padding: 10px 10px 30px 10px;
+}
+
+.page-title {
+    font-size: 28px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #222;
+}
+
+.card-custom {
+    background: #fff;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.card-header-custom {
+    background: #343a40;
+    color: white;
+    padding: 14px 18px;
+    font-size: 18px;
+    font-weight: bold;
+    border-bottom: 1px solid #ddd;
+}
+
+.card-body-custom {
+    padding: 18px;
+}
+
+.form-control {
+    border-radius: 4px;
+}
+
+.btn-blue {
+    background: #007bff;
+    color: white;
+    border: none;
+}
+
+.btn-blue:hover {
+    background: #0069d9;
+    color: white;
+}
+
+.btn-yellow {
+    background: #ffc107;
+    color: #212529;
+    border: none;
+}
+
+.btn-yellow:hover {
+    background: #e0a800;
+    color: #212529;
+}
+
+.btn-red {
+    background: #dc3545;
+    color: white;
+    border: none;
+}
+
+.btn-red:hover {
+    background: #c82333;
+    color: white;
+}
+
+.table thead th {
+    background: #343a40;
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+.badge-role {
+    padding: 6px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.badge-manager {
+    background: #007bff;
+    color: white;
+}
+
+.badge-staff {
+    background: #28a745;
+    color: white;
+}
+
+.badge-cashier {
+    background: #17a2b8;
+    color: white;
+}

@@ -1,5 +1,6 @@
 package Controller;
 
+import DAO.so_do_banDAO;
 import Model.CoffeeTable;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -21,8 +22,8 @@ public class TrangChuServlet extends HttpServlet {
         }
 
         // Lấy danh sách bàn từ code CoffeeTable cũ của ông ra
-        CoffeeTable tableModel = new CoffeeTable(0, "", "", "");
-        List<CoffeeTable> dsBan = tableModel.getAllTables();
+        so_do_banDAO dao = new so_do_banDAO();
+        List<CoffeeTable> dsBan = dao.getAllTablesFromDB(); // Gọi dữ liệu thật từ MySQL
 
         // Gửi dữ liệu bàn sang file jsp để in ra màn hình
         request.setAttribute("danhSachBan", dsBan);

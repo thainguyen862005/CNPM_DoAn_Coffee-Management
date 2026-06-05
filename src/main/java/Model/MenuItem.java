@@ -12,18 +12,6 @@ public class MenuItem {
 
     private static List<MenuItem> danhSachMon = new ArrayList<>();
 
-    static {
-        danhSachMon.add(new MenuItem(1, "Ca phe den", 20000, "Ca phe nguyen chat", "Còn bán"));
-        danhSachMon.add(new MenuItem(2, "Tra dao", 30000, "Tra dao cam sa", "Còn bán"));
-        danhSachMon.add(new MenuItem(3, "Nuoc ep cam", 35000, "Cam tuoi vao", "Ngừng bán"));
-
-        danhSachMon.add(new MenuItem(4, "Bac xiu", 25000, "Bac xiu sua da", "Còn bán"));
-        danhSachMon.add(new MenuItem(5, "Ca phe sua", 25000, "Ca phe sua da", "Còn bán"));
-        danhSachMon.add(new MenuItem(6, "Tra sua tran chau", 35000, "Tra sua kem tran chau", "Còn bán"));
-        danhSachMon.add(new MenuItem(7, "Sinh to bo", 40000, "Sinh to bo tuoi", "Còn bán"));
-        danhSachMon.add(new MenuItem(8, "Matcha latte", 45000, "Matcha latte da", "Còn bán"));
-    }
-
     public MenuItem() {}
 
     public MenuItem(int itemId, String itemName, double price, String description, String status) {

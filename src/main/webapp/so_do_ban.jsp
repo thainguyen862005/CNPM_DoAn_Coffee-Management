@@ -32,7 +32,7 @@
                         <%-- TRẠNG THÁI 3: CHƯA THANH TOÁN --%>
                         <c:when test="${ban.status eq 'Chưa thanh toán'}">
                             <span class="badge badge-warning text-dark"><i class="fa fa-exclamation-circle"></i> Chưa thanh toán</span>
-                            <button onclick="moPopupThanhToan(${ban.tableId})" class="btn btn-outline-info btn-sm mt-2 btn-block" data-bs-toggle="modal" data-bs-target="#modalThanhToan">Thanh Toán</button>
+                            <button type="button" onclick="moPopupThanhToan(${ban.tableId})" class="btn btn-outline-info btn-sm mt-2 btn-block">Thanh Toán</button>
                         </c:when>
 
                         <%-- PHÒNG HỜ CÁC TRẠNG THÁI KHÁC NẾU CÓ --%>
@@ -49,31 +49,31 @@
 <div class="modal fade" id="modalThanhToan" tabindex="-1">
     <div class="modal-dialog">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Xác nhận thanh toán</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <div class="modal-header bg-warning">
+                <h5 class="modal-title"><i class="fa fa-calculator"></i> Xác nhận thanh toán</h5>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
             </div>
-            <div class="modal-body text-center">
-                <h4 id="bill-content">Đang tải dữ liệu bàn...</h4>
-                <p>Xác nhận đã thu tiền khách hàng? Bàn sẽ được dọn trống.</p>
-            </div>
-            <div class="modal-footer d-flex justify-content-center">
-                <form action="HoaDon" method="POST">
-                    <input type="hidden" name="action" value="confirm_payment">
-                    <input type="hidden" name="tableId" id="pay_table_id" value="">
-                    <button type="submit" class="btn btn-success btn-lg">Đã Thu Tiền</button>
-                </form>
+            <div class="modal-body" id="bill-content">
+                <h4 class="text-center">Đang tải dữ liệu hóa đơn...</h4>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Hàm này kích hoạt khi bấm nút "Thanh Toán" ở bàn màu Vàng
     function moPopupThanhToan(tableId) {
-        // Nhét ID của bàn vào thẻ input ẩn để submit form
-        document.getElementById('pay_table_id').value = tableId;
-        // Đổi chữ trên Popup
-        document.getElementById('bill-content').innerHTML = "Thanh toán cho Bàn số: " + tableId;
+        // Dùng jQuery ép mở cái bảng Popup lên liền
+        $('#modalThanhToan').modal('show');
+
+        document.getElementById('bill-content').innerHTML = '<div class="text-center my-3"><div class="spinner-border text-warning"></div><p>Đang lôi hóa đơn ra...</p></div>';
+
+        fetch('HoaDon?action=detail_by_table&tableId=' + tableId)
+            .then(response => response.text())
+            .then(html => {
+                document.getElementById('bill-content').innerHTML = html;
+            })
+            .catch(error => {
+                document.getElementById('bill-content').innerHTML = '<div class="alert alert-danger">Lỗi mạng! Không lấy được hóa đơn.</div>';
+            });
     }
 </script>

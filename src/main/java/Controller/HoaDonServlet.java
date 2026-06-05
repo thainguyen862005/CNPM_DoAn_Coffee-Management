@@ -30,6 +30,18 @@ public class HoaDonServlet extends HttpServlet {
             }
             request.getRequestDispatcher("chi_tiet_hoa_don.jsp").forward(request, response);
         }
+        // LUỒNG 1.5: XEM CHI TIẾT TỪ SƠ ĐỒ BÀN
+        else if ("detail_by_table".equals(action)) {
+            String tableIdParam = request.getParameter("tableId");
+            if (tableIdParam != null) {
+                int tableId = Integer.parseInt(tableIdParam);
+                // Gọi DAO lôi hóa đơn lên
+                Order order = dao.getOrderByTableId(tableId);
+                request.setAttribute("order", order);
+            }
+            // Trả về chung 1 file giao diện với luồng 1
+            request.getRequestDispatcher("chi_tiet_hoa_don.jsp").forward(request, response);
+        }
 
         // LUỒNG 2: XEM TẤT CẢ DANH SÁCH (Mặc định)
         else {
@@ -53,6 +65,18 @@ public class HoaDonServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         HoaDonDAO dao = new HoaDonDAO();
+
+        // LUỒNG THANH TOÁN (UC-12)
+        if ("thanh_toan".equals(action)) {
+            int orderId = Integer.parseInt(request.getParameter("orderId"));
+            int tableId = Integer.parseInt(request.getParameter("tableId"));
+
+            // Gọi DAO để thực hiện UC-19 và UC-20
+            dao.thanhToanHoaDon(orderId, tableId);
+
+            // Thanh toán xong thì load lại trang danh sách hóa đơn
+            response.sendRedirect("HoaDon");
+        }
         // LUỒNG 1: TẠO HÓA ĐƠN MỚI
         if ("create".equals(action)) {
             String tableIdParam = request.getParameter("tableId");

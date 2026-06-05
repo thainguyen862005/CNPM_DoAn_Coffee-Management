@@ -65,5 +65,51 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    // 1. Tự động tính tiền thối khi gõ số
+    function tinhTienThoi(tongTien) {
+        let khachDua = document.getElementById('tienKhachDua').value;
+        let tienThoi = khachDua - tongTien;
+        if(tienThoi < 0) tienThoi = 0;
+        document.getElementById('tienThoiLai').value = tienThoi.toLocaleString('vi-VN') + " đ";
+    }
+
+    // 2. Dùng AJAX để thanh toán không chuyển trang
+    function thucHienThanhToan(event, tongTien) {
+        // Chặn không cho form load sang trang khác
+        event.preventDefault();
+
+        let khachDua = document.getElementById('tienKhachDua').value;
+        if(khachDua === "" || parseInt(khachDua) < tongTien) {
+            alert("Khách đưa chưa đủ tiền kìa!");
+            return false;
+        }
+
+        if(confirm('Xác nhận đã thu đủ ' + tongTien.toLocaleString('vi-VN') + ' đ?')) {
+            let form = event.target;
+            let formData = new URLSearchParams(new FormData(form));
+
+            // Gửi ngầm dữ liệu xuống HoaDonServlet
+            fetch('HoaDon', {
+                method: 'POST',
+                body: formData
+            }).then(() => {
+                let container = document.getElementById('bill-content');
+                if (!container) container = document.getElementById('modal-body-content');
+
+                if(container) {
+                    container.innerHTML =
+                        '<div class="alert alert-success text-center mt-3">' +
+                        '<i class="fa fa-check-circle" style="font-size: 50px;"></i>' +
+                        '<h4 class="mt-3">Thanh toán thành công!</h4>' +
+                        '<p>Bàn đã được dọn sạch sẽ.</p>' +
+                        '<button type="button" class="btn btn-secondary mt-3" onclick="location.reload()">Đóng & Làm mới</button>' +
+                        '</div>';
+                }
+            }).catch(error => alert("Lỗi kết nối tới máy chủ!"));
+        }
+        return false;
+    }
+</script>
 </body>
 </html>

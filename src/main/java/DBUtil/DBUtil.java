@@ -17,7 +17,6 @@ public class DBUtil {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
             conn = DriverManager.getConnection(URL, USER, PASSWORD);
-            System.out.println("-> KẾT NỐI DATABASE THÀNH CÔNG!");
         } catch (ClassNotFoundException e) {
             System.out.println("-> LỖI: Chưa có thư viện MySQL Driver (mysql-connector-j.jar) trong thư mục lib!");
             e.printStackTrace();

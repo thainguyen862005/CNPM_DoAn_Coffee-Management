@@ -85,6 +85,9 @@
                 </div>
             </div>
             <div class="modal-footer">
+                <button type="button" id="btnMoCapNhat" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#capNhatHoaDonModal" data-dismiss="modal">
+                    <i class="fa fa-edit"></i> Cập nhật
+                </button>
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
             </div>
         </div>
@@ -151,6 +154,69 @@
     </div>
 </div>
 
+<div class="modal fade" id="capNhatHoaDonModal" tabindex="-1">
+    <div class="modal-dialog">
+        <form action="HoaDon" method="POST">
+            <input type="hidden" name="action" value="update">
+            <input type="hidden" name="orderId" id="update_order_id" value="">
+
+            <div class="modal-content">
+                <div class="modal-header bg-warning text-dark">
+                    <h5 class="modal-title">Cập nhật Hóa đơn <span id="display_order_id"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label class="fw-bold mb-2">1. Chuyển sang bàn khác?</label>
+                        <select name="newTableId" class="form-select form-control">
+                            <option value="-1" selected>-- Giữ nguyên bàn hiện tại --</option>
+                            <option value="0">🛒 Chuyển sang Mua mang đi</option>
+                            <c:forEach var="table" items="${listTable}">
+                                <c:if test="${table.status eq 'Trống'}">
+                                    <option value="${table.tableId}">
+                                        [Trống] - ${table.tableName} (${table.area})
+                                    </option>
+                                </c:if>
+                            </c:forEach>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="fw-bold mb-2">2. Gọi thêm món:</label>
+                        <div style="max-height: 250px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px;">
+                            <c:forEach var="item" items="${listMenu}">
+                                <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" name="itemIds" value="${item.itemId}" id="upd_item_${item.itemId}">
+                                        <label class="form-check-label ms-2" for="upd_item_${item.itemId}">
+                                            <strong>${item.itemName}</strong> <br>
+                                            <small class="text-danger">${item.price} VNĐ</small>
+                                        </label>
+                                    </div>
+                                    <input type="number" name="qty_${item.itemId}" class="form-control text-center" style="width: 70px;" value="1" min="1">
+                                </div>
+                            </c:forEach>
+                        </div>
+                        <small class="text-muted fst-italic">Bỏ trống nếu không gọi thêm đồ uống.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Lưu Thay Đổi</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Hàm đẩy Mã hóa đơn vào Popup khi người dùng bấm nút
+    function moPopupCapNhat(orderId) {
+        document.getElementById('update_order_id').value = orderId;
+        document.getElementById('display_order_id').innerText = "#" + orderId;
+    }
+</script>
+
 <script>
     function taiDuLieuChiTiet(orderId) {
         // Hiện chữ Đang tải... trong lúc chờ Server trả dữ liệu
@@ -160,8 +226,22 @@
         fetch('HoaDon?action=detail&id=' + orderId)
             .then(response => response.text())
             .then(html => {
-                // Đổ dữ liệu HTML lấy được vào trong thân của Popup
+                // 1. Đổ dữ liệu HTML lấy được vào trong thân của Popup
                 document.getElementById('modal-body-content').innerHTML = html;
+
+                // 2. Gán động sự kiện click kèm mã ID chuẩn xác cho nút Cập Nhật
+                var btnCapNhat = document.getElementById('btnMoCapNhat');
+                if (btnCapNhat) {
+                    btnCapNhat.setAttribute('onclick', 'moPopupCapNhat(' + orderId + ')');
+                }
+
+                // 3. Đọc trạng thái từ input ẩn bên file chi_tiet_hoa_don.jsp vừa trả về
+                var statusInput = document.getElementById('order_status_hidden');
+                if (statusInput && statusInput.value === 'Đã thanh toán') {
+                    if (btnCapNhat) btnCapNhat.style.display = 'none';  // Ẩn nút nếu đã thanh toán
+                } else {
+                    if (btnCapNhat) btnCapNhat.style.display = 'inline-block'; // Hiện lại nút nếu chưa thanh toán
+                }
             })
             .catch(error => {
                 document.getElementById('modal-body-content').innerHTML = '<p class="text-danger">Lỗi mạng hoặc không tải được dữ liệu!</p>';

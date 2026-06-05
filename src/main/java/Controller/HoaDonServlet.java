@@ -101,5 +101,60 @@ public class HoaDonServlet extends HttpServlet {
 
             response.sendRedirect("TrangChu");
         }
+        // LUỒNG 4: CẬP NHẬT HÓA ĐƠN (ĐỔI BÀN, THÊM MÓN)
+        else if ("update".equals(action)) {
+            // 1. Lấy mã hóa đơn cần cập nhật từ biểu mẫu gửi lên
+            int orderId = Integer.parseInt(request.getParameter("orderId"));
+
+            dao = new HoaDonDAO();
+
+            // ĐIỀU KIỆN BẢO VỆ: Kiểm tra trạng thái hóa đơn dưới Cơ sở dữ liệu
+            Model.Order currentOrder = dao.getOrderById(orderId);
+            if (currentOrder != null && "Đã thanh toán".equals(currentOrder.getStatus())) {
+                // Nếu hóa đơn đã thanh toán, lập tức từ chối xử lý và quay về trang danh sách
+                // Có thể truyền thêm tham số ?error=paid để hiển thị thông báo alert ngoài giao diện nếu muốn
+                response.sendRedirect("HoaDon?error=paid");
+                return; // Thoát luồng, ngăn chặn hoàn toàn code phía dưới chạy tiếp
+            }
+
+            // 2. Lấy thông tin ID bàn mới (nếu có yêu cầu đổi bàn)
+            String newTableIdParam = request.getParameter("newTableId");
+            int newTableId = (newTableIdParam != null && !newTableIdParam.isEmpty()) ? Integer.parseInt(newTableIdParam) : -1;
+
+            // Xử lý HÀNH ĐỘNG 1: ĐỔI BÀN (Nếu người dùng chọn một bàn hợp lệ khác -1)
+            if (newTableId != -1) {
+                int oldTableId = dao.getTableIdByOrderId(orderId);
+
+                if (oldTableId != newTableId) {
+                    // Thay đổi ID bàn của hóa đơn này trong bảng orders
+                    dao.updateOrderTable(orderId, newTableId);
+
+                    // Cập nhật lại trạng thái hiển thị của 2 cái bàn trên sơ đồ phòng
+                    so_do_banDAO banDao = new so_do_banDAO();
+                    if (oldTableId > 0) {
+                        banDao.updateCoffeeTableStatus(oldTableId, "Trống");
+                    }
+                    if (newTableId > 0) {
+                        banDao.updateCoffeeTableStatus(newTableId, "Đang phục vụ");
+                    }
+                }
+            }
+
+            // Xử lý HÀNH ĐỘNG 2: GỌI THÊM MÓN (Nếu có danh sách món được chọn)
+            String[] selectedItems = request.getParameterValues("itemIds");
+            if (selectedItems != null) {
+                for (String itemIdStr : selectedItems) {
+                    int itemId = Integer.parseInt(itemIdStr);
+                    String qtyStr = request.getParameter("qty_" + itemId);
+                    int quantity = (qtyStr != null && !qtyStr.isEmpty()) ? Integer.parseInt(qtyStr) : 1;
+
+                    // Gọi hàm xử lý cộng dồn số lượng nếu món đã tồn tại, hoặc tạo mới nếu chưa có
+                    dao.addOrUpdateOrderDetail(orderId, itemId, quantity);
+                }
+            }
+
+            // 3. Sau khi cập nhật thành công, chuyển hướng tải lại trang danh sách hóa đơn
+            response.sendRedirect("HoaDon");
+        }
     }
 }

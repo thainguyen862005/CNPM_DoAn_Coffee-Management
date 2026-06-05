@@ -231,4 +231,56 @@ public class HoaDonDAO {
             e.printStackTrace();
         }
     }
+
+    // 1. Hàm lấy ID bàn hiện tại của hóa đơn
+    public int getTableIdByOrderId(int orderId) {
+        String sql = "SELECT table_id FROM orders WHERE order_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt("table_id");
+        } catch (Exception e) { e.printStackTrace(); }
+        return 0; // Trả về 0 nghĩa là đang ở trạng thái Mang đi
+    }
+
+    // 2. Hàm đổi bàn mới cho hóa đơn
+    public void updateOrderTable(int orderId, int newTableId) {
+        String sql = "UPDATE orders SET table_id = ? WHERE order_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            if (newTableId > 0) ps.setInt(1, newTableId);
+            else ps.setNull(1, java.sql.Types.INTEGER); // Chuyển sang Mua mang đi
+            ps.setInt(2, orderId);
+            ps.executeUpdate();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    // 3. Hàm gọi thêm món (Nếu món đã có thì cộng dồn số lượng, chưa có thì thêm mới)
+    public void addOrUpdateOrderDetail(int orderId, int itemId, int quantityAdded) {
+        String checkSql = "SELECT quantity FROM order_details WHERE order_id = ? AND item_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement psCheck = conn.prepareStatement(checkSql)) {
+
+            psCheck.setInt(1, orderId);
+            psCheck.setInt(2, itemId);
+            ResultSet rs = psCheck.executeQuery();
+
+            if (rs.next()) {
+                // Đã gọi món này rồi -> Cộng dồn số lượng và tính lại tiền (Subtotal)
+                int newQty = rs.getInt("quantity") + quantityAdded;
+                String updateSql = "UPDATE order_details SET quantity = ?, subtotal = unit_price * ? WHERE order_id = ? AND item_id = ?";
+                try (PreparedStatement psUpdate = conn.prepareStatement(updateSql)) {
+                    psUpdate.setInt(1, newQty);
+                    psUpdate.setInt(2, newQty);
+                    psUpdate.setInt(3, orderId);
+                    psUpdate.setInt(4, itemId);
+                    psUpdate.executeUpdate();
+                }
+            } else {
+                // Món mới hoàn toàn -> Gọi lại hàm thêm mới của bạn
+                addOrderDetail(orderId, itemId, quantityAdded);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+    }
 }

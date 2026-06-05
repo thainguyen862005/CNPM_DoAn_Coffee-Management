@@ -54,12 +54,12 @@ public class HoaDonDAO {
     public Order getOrderById(int orderId) {
         Order order = null;
 
-        String sqlOrder = "SELECT o.order_id, o.created_at, o.status, o.table_id, t.table_name " +
+        String sqlOrder = "SELECT o.order_id, o.created_at, o.status, o.table_id, t.table_name, o.order_type " +
                 "FROM orders o LEFT JOIN coffee_tables t ON o.table_id = t.table_id " +
                 "WHERE o.order_id = ?";
 
         // ĐÃ SỬA: Lấy thêm m.item_id
-        String sqlDetails = "SELECT d.quantity, d.unit_price, d.subtotal, m.item_name, m.item_id " +
+        String sqlDetails = "SELECT d.quantity, d.unit_price, d.subtotal, m.item_name, m.item_id, d.note, d.status " +
                 "FROM order_details d JOIN menu_items m ON d.item_id = m.item_id " +
                 "WHERE d.order_id = ?";
 
@@ -71,6 +71,7 @@ public class HoaDonDAO {
             if (rsOrder.next()) {
                 order = new Order();
                 order.setOrderId(rsOrder.getInt("order_id"));
+                order.setOrderType(rsOrder.getString("order_type"));
                 if (rsOrder.getTimestamp("created_at") != null) {
                     order.setCreatedAt(rsOrder.getTimestamp("created_at").toLocalDateTime());
                 }
@@ -87,13 +88,15 @@ public class HoaDonDAO {
 
                 while (rsDetail.next()) {
                     Model.MenuItem item = new Model.MenuItem();
-                    // ĐÃ SỬA: Gắn mã ID và Giá tiền cho món ăn
                     item.setItemId(rsDetail.getInt("item_id"));
                     item.setItemName(rsDetail.getString("item_name"));
                     item.setPrice(rsDetail.getDouble("unit_price"));
 
-                    // Ném vào danh sách của hóa đơn
-                    order.addItem(item, rsDetail.getInt("quantity"));
+                    Model.OrderDetail detail = new Model.OrderDetail(item, rsDetail.getInt("quantity"));
+                    detail.setNote(rsDetail.getString("note"));
+                    detail.setStatus(rsDetail.getString("status"));
+
+                    order.getOrderDetails().add(detail);
                 }
             }
         } catch (Exception e) {
@@ -146,34 +149,38 @@ public class HoaDonDAO {
     }
 
     // 2. Hàm tạo hóa đơn và trả về Mã Hóa Đơn (ID) vừa tạo
-    public int createOrderAndReturnId(int tableId) {
-        String sql = "INSERT INTO orders (table_id, created_at, status) VALUES (?, NOW(), 'Đang phục vụ')";
+    public int createOrderAndReturnId(int tableId, String orderType) {
+        String sql = "INSERT INTO orders (table_id, created_at, status, order_type) VALUES (?, NOW(), 'Đang phục vụ', ?)";
         try (Connection conn = DBUtil.getConnection();
-             // Chú ý: RETURN_GENERATED_KEYS giúp lấy được ID ngay sau khi INSERT
              PreparedStatement ps = conn.prepareStatement(sql, java.sql.Statement.RETURN_GENERATED_KEYS)) {
 
             if (tableId > 0) ps.setInt(1, tableId);
             else ps.setNull(1, java.sql.Types.INTEGER);
 
+            ps.setString(2, orderType != null ? orderType : "DINE_IN");
+
             ps.executeUpdate();
             ResultSet rs = ps.getGeneratedKeys();
-            if (rs.next()) return rs.getInt(1); // Trả về mã ID
+            if (rs.next()) return rs.getInt(1);
 
         } catch (Exception e) { e.printStackTrace(); }
         return -1;
     }
 
     // 3. Hàm thêm từng món ăn khách chọn vào hóa đơn đó
-    public void addOrderDetail(int orderId, int itemId, int quantity) {
-        String sql = "INSERT INTO order_details (order_id, item_id, quantity, unit_price, subtotal) " +
-                "SELECT ?, ?, ?, price, price * ? FROM menu_items WHERE item_id = ?";
+    public void addOrderDetail(int orderId, Model.OrderDetail detail) {
+        String sql = "INSERT INTO order_details (order_id, item_id, quantity, unit_price, subtotal, note, status) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, orderId);
-            ps.setInt(2, itemId);
-            ps.setInt(3, quantity);
-            ps.setInt(4, quantity);
-            ps.setInt(5, itemId);
+            ps.setInt(2, detail.getMenuItem().getItemId());
+            ps.setInt(3, detail.getQuantity());
+            ps.setDouble(4, detail.getUnitPrice());
+            ps.setDouble(5, detail.getSubtotal());
+            ps.setString(6, detail.getNote());
+            ps.setString(7, detail.getStatus() != null ? detail.getStatus() : "PENDING");
+
             ps.executeUpdate();
         } catch (Exception e) { e.printStackTrace(); }
     }
@@ -257,31 +264,36 @@ public class HoaDonDAO {
     }
 
     // 3. Hàm gọi thêm món (Nếu món đã có thì cộng dồn số lượng, chưa có thì thêm mới)
-    public void addOrUpdateOrderDetail(int orderId, int itemId, int quantityAdded) {
-        String checkSql = "SELECT quantity FROM order_details WHERE order_id = ? AND item_id = ?";
+    public void addOrUpdateOrderDetail(int orderId, Model.OrderDetail detail) {
+        // Chỉ tìm kiếm và cộng dồn nếu món đó đang ở trạng thái PENDING
+        String checkSql = "SELECT quantity FROM order_details WHERE order_id = ? AND item_id = ? AND status = 'PENDING'";
+
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement psCheck = conn.prepareStatement(checkSql)) {
 
             psCheck.setInt(1, orderId);
-            psCheck.setInt(2, itemId);
+            psCheck.setInt(2, detail.getMenuItem().getItemId());
             ResultSet rs = psCheck.executeQuery();
 
             if (rs.next()) {
-                // Đã gọi món này rồi -> Cộng dồn số lượng và tính lại tiền (Subtotal)
-                int newQty = rs.getInt("quantity") + quantityAdded;
-                String updateSql = "UPDATE order_details SET quantity = ?, subtotal = unit_price * ? WHERE order_id = ? AND item_id = ?";
+                // Đã có món này và chưa pha chế -> Cộng dồn số lượng và tính lại tiền
+                int newQty = rs.getInt("quantity") + detail.getQuantity();
+                String updateSql = "UPDATE order_details SET quantity = ?, subtotal = unit_price * ? WHERE order_id = ? AND item_id = ? AND status = 'PENDING'";
+
                 try (PreparedStatement psUpdate = conn.prepareStatement(updateSql)) {
                     psUpdate.setInt(1, newQty);
                     psUpdate.setInt(2, newQty);
                     psUpdate.setInt(3, orderId);
-                    psUpdate.setInt(4, itemId);
+                    psUpdate.setInt(4, detail.getMenuItem().getItemId());
                     psUpdate.executeUpdate();
                 }
             } else {
-                // Món mới hoàn toàn -> Gọi lại hàm thêm mới của bạn
-                addOrderDetail(orderId, itemId, quantityAdded);
+                // Món mới hoàn toàn, hoặc món cũ đã được đem đi pha chế -> Gọi hàm thêm mới đã viết ở Task 1.3
+                addOrderDetail(orderId, detail);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     //Thanh toán hoá đơn, chuyển trạng thái, lưu hoá đơn
@@ -324,5 +336,26 @@ public class HoaDonDAO {
             System.out.println("Lỗi tìm order theo bàn: " + e.getMessage());
         }
         return null;
+    }
+    public boolean removeOrderDetailSafe(int orderDetailId) {
+        String checkSql = "SELECT status FROM order_details WHERE order_detail_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement psCheck = conn.prepareStatement(checkSql)) {
+
+            psCheck.setInt(1, orderDetailId);
+            ResultSet rs = psCheck.executeQuery();
+
+            // Kiểm tra nếu món đang ở trạng thái PENDING thì mới cho phép xóa
+            if (rs.next() && "PENDING".equals(rs.getString("status"))) {
+                String deleteSql = "DELETE FROM order_details WHERE order_detail_id = ?";
+                try (PreparedStatement psDelete = conn.prepareStatement(deleteSql)) {
+                    psDelete.setInt(1, orderDetailId);
+                    int rows = psDelete.executeUpdate();
+                    return rows > 0;
+                }
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+
+        return false; // Trả về false nếu món không tồn tại hoặc đã pha chế
     }
 }

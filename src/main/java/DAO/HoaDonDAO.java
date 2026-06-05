@@ -283,4 +283,46 @@ public class HoaDonDAO {
             }
         } catch (Exception e) { e.printStackTrace(); }
     }
+
+    //Thanh toán hoá đơn, chuyển trạng thái, lưu hoá đơn
+    public void thanhToanHoaDon(int orderId, int tableId) {
+        String sqlUpdateOrder = "UPDATE orders SET status = 'Đã thanh toán' WHERE order_id = ?";
+        String sqlUpdateTable = "UPDATE coffee_tables SET status = 'Trống' WHERE table_id = ?";
+
+        try (Connection conn = DBUtil.getConnection()) {
+            // UC-20: Lưu trạng thái hóa đơn thành Đã thanh toán
+            try (PreparedStatement ps1 = conn.prepareStatement(sqlUpdateOrder)) {
+                ps1.setInt(1, orderId);
+                ps1.executeUpdate();
+            }
+
+            // UC-19: Cập nhật trạng thái bàn về Trống (chỉ cập nhật nếu hóa đơn có gắn với bàn)
+            if (tableId > 0) {
+                try (PreparedStatement ps2 = conn.prepareStatement(sqlUpdateTable)) {
+                    ps2.setInt(1, tableId);
+                    ps2.executeUpdate();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi khi thanh toán: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Hàm tìm hóa đơn đang mở dựa vào ID Bàn (Dùng cho bên Sơ đồ bàn)
+    public Order getOrderByTableId(int tableId) {
+        String sql = "SELECT order_id FROM orders WHERE table_id = ? AND status != 'Đã thanh toán' ORDER BY order_id DESC LIMIT 1";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, tableId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                // Tận dụng lại hàm getOrderById đã viết từ trước cho khỏe
+                return getOrderById(rs.getInt("order_id"));
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi tìm order theo bàn: " + e.getMessage());
+        }
+        return null;
+    }
 }

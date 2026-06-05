@@ -198,4 +198,37 @@ public class HoaDonDAO {
         }
         return list;
     }
+
+    // Hàm cập nhật trạng thái hóa đơn dựa trên ID bàn
+    public void updateStatusByTable(int tableId, String oldStatus, String newStatus) {
+        String sql = "UPDATE orders SET status = ? WHERE table_id = ? AND status = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newStatus);
+            ps.setInt(2, tableId);
+            ps.setString(3, oldStatus);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Lỗi cập nhật trạng thái: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Hàm cập nhật trạng thái vật lý thẳng vào bảng coffee_tables
+    public void updateCoffeeTableStatus(int tableId, String status) {
+        String sql = "UPDATE coffee_tables SET status = ? WHERE table_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, status);
+            ps.setInt(2, tableId);
+            ps.executeUpdate();
+
+            System.out.println("Đã cập nhật Bảng coffee_tables bàn số " + tableId + " thành: " + status);
+
+        } catch (Exception e) {
+            System.out.println("Lỗi cập nhật bảng coffee_tables: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

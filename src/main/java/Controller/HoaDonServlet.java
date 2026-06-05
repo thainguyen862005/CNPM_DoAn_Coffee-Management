@@ -1,6 +1,7 @@
 package Controller;
 
 import DAO.HoaDonDAO;
+import DAO.so_do_banDAO;
 import Model.Order;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -51,31 +52,54 @@ public class HoaDonServlet extends HttpServlet {
     }
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-
+        HoaDonDAO dao = new HoaDonDAO();
+        // LUỒNG 1: TẠO HÓA ĐƠN MỚI
         if ("create".equals(action)) {
             String tableIdParam = request.getParameter("tableId");
             int tableId = (tableIdParam != null && !tableIdParam.isEmpty()) ? Integer.parseInt(tableIdParam) : 0;
 
-            HoaDonDAO dao = new HoaDonDAO();
-            // 1. Tạo hóa đơn rỗng trước để lấy mã ID
             int newOrderId = dao.createOrderAndReturnId(tableId);
 
-            // 2. Quét xem nhân viên đã Tick chọn những món nào trên màn hình để lưu vào DB
             if (newOrderId > 0) {
-                String[] selectedItems = request.getParameterValues("itemIds"); // Lấy các ô checkbox
+                // THÊM DÒNG NÀY: Chuyển trạng thái bàn trong MySQL thành Đang phục vụ
+                dao.updateCoffeeTableStatus(tableId, "Đang phục vụ");
+                String[] selectedItems = request.getParameterValues("itemIds");
                 if (selectedItems != null) {
                     for (String itemIdStr : selectedItems) {
                         int itemId = Integer.parseInt(itemIdStr);
-                        // Lấy số lượng tương ứng với món ăn đó
                         String qtyStr = request.getParameter("qty_" + itemId);
                         int quantity = (qtyStr != null && !qtyStr.isEmpty()) ? Integer.parseInt(qtyStr) : 1;
-
-                        // Lưu món ăn vào Database
                         dao.addOrderDetail(newOrderId, itemId, quantity);
                     }
                 }
             }
             response.sendRedirect("HoaDon");
+        }
+
+        // LUỒNG 2: NÚT "CHUYỂN THANH TOÁN"
+        else if ("request_payment".equals(action)) {
+            int tableId = Integer.parseInt(request.getParameter("tableId"));
+            // 1. Cập nhật hóa đơn
+            HoaDonDAO hoaDonDao = new HoaDonDAO();
+            hoaDonDao.updateStatusByTable(tableId, "Đang phục vụ", "Chưa thanh toán");
+            // 2. Cập nhật bàn
+            so_do_banDAO banDao = new so_do_banDAO();
+            banDao.updateCoffeeTableStatus(tableId, "Chưa thanh toán");
+
+            response.sendRedirect("TrangChu");
+        }
+
+        // LUỒNG 3: NÚT "ĐÃ THU TIỀN" (POPUP XÁC NHẬN)
+        else if ("confirm_payment".equals(action)) {
+            int tableId = Integer.parseInt(request.getParameter("tableId"));
+            // 1. Cập nhật hóa đơn
+            HoaDonDAO hoaDonDao = new HoaDonDAO();
+            hoaDonDao.updateStatusByTable(tableId, "Chưa thanh toán", "Đã thanh toán");
+            // 2. Cập nhật bàn
+            so_do_banDAO banDao = new so_do_banDAO();
+            banDao.updateCoffeeTableStatus(tableId, "Trống");
+
+            response.sendRedirect("TrangChu");
         }
     }
 }

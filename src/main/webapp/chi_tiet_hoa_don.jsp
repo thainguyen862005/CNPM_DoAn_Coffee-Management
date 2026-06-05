@@ -3,6 +3,7 @@
 
 <c:choose>
     <c:when test="${not empty order}">
+        <input type="hidden" id="order_status_hidden" value="${order.status}">
         <p><strong>Mã HĐ:</strong> #${order.orderId}</p>
         <p><strong>Thời gian:</strong> ${order.createdAt}</p>
         <table class="table table-bordered text-center mt-3">

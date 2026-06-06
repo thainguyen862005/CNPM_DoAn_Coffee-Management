@@ -79,24 +79,46 @@ public class HoaDonServlet extends HttpServlet {
         }
         // LUỒNG 1: TẠO HÓA ĐƠN MỚI
         if ("create".equals(action)) {
+            // ĐIỀU KIỆN 1: PHÂN QUYỀN (ADMIN BỊ CHẶN - STAFF THÌ ĐƯỢC CHẠY TIẾP)
+            jakarta.servlet.http.HttpSession session = request.getSession();
+            String role = (String) session.getAttribute("role");
+
+            // Nếu người dùng là Admin hoặc Manager -> Hệ thống chặn lại lập tức
+            if (role != null && (role.equalsIgnoreCase("Admin"))) {
+                response.sendRedirect("HoaDon?error=unauthorized");
+                return; // Gặp lệnh này Admin sẽ bị dừng luồng và đẩy ra ngoài ngay lập tức
+            }
+            // ĐIỀU KIỆN 2: BẢO VỆ BÀN PHỤC VỤ (BÀN CHƯA THANH TOÁN THÌ KHÔNG ĐƯỢC ĐẶT)
             String tableIdParam = request.getParameter("tableId");
             int tableId = (tableIdParam != null && !tableIdParam.isEmpty()) ? Integer.parseInt(tableIdParam) : 0;
 
+            if (tableId > 0) {
+                Model.Order activeOrder = dao.getOrderByTableId(tableId); //
+                if (activeOrder != null) {
+                    response.sendRedirect("HoaDon?error=table_not_paid");
+                    return; // Chặn không cho tạo đè hóa đơn mới lên bàn cũ chưa tính tiền
+                }
+            }
+            // LUỒNG XỬ LÝ CHÍNH CHO STAFF: TẠO HÓA ĐƠN
             int newOrderId = dao.createOrderAndReturnId(tableId);
 
             if (newOrderId > 0) {
-                // THÊM DÒNG NÀY: Chuyển trạng thái bàn trong MySQL thành Đang phục vụ
-                dao.updateCoffeeTableStatus(tableId, "Đang phục vụ");
-                String[] selectedItems = request.getParameterValues("itemIds");
+                // Chuyển trạng thái bàn trong MySQL sang "Đang phục vụ"
+                dao.updateCoffeeTableStatus(tableId, "Đang phục vụ"); //
+
+                String[] selectedItems = request.getParameterValues("itemIds"); //
                 if (selectedItems != null) {
                     for (String itemIdStr : selectedItems) {
                         int itemId = Integer.parseInt(itemIdStr);
                         String qtyStr = request.getParameter("qty_" + itemId);
                         int quantity = (qtyStr != null && !qtyStr.isEmpty()) ? Integer.parseInt(qtyStr) : 1;
-                        dao.addOrderDetail(newOrderId, itemId, quantity);
+
+                        // Lưu món vào chi tiết đơn hàng
+                        dao.addOrderDetail(newOrderId, itemId, quantity); //
                     }
                 }
             }
+
             response.sendRedirect("HoaDon");
         }
 

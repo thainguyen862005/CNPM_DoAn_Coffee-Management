@@ -8,19 +8,7 @@
     <title>Hệ Thống Quản Lý Quán Cafe</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <style>
-        .sidebar { background-color: #343a40; height: 100vh; padding: 0; }
-        .sidebar a { color: #cfd8dc; display: block; padding: 15px; border-bottom: 1px solid #454d55; text-decoration: none; }
-        .sidebar a:hover { background-color: #495057; color: white; }
-        .sidebar i { width: 25px; }
-        .top-navbar { background-color: #007bff; color: white; padding: 10px 20px; }
-        .sidebar a.active-tab {
-            background-color: cornflowerblue;
-            color: white;
-            font-weight: bold;
-            border-left: 5px solid #ffc107; /* Vạch vàng nổi bật */
-        }
-    </style>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main-layout.css">
 </head>
 <body>
 <div class="top-navbar d-flex justify-content-between align-items-center">
@@ -39,60 +27,63 @@
     </div>
 </div>
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-md-2 sidebar">
+<div class="app-body">
+    <aside class="sidebar">
 
-            <%--
-                UC-03 - Kiểm tra quyền truy cập
-                Main Flow [3.1.3]: Hệ thống lấy thông tin role của người dùng từ Session.
-                Main Flow [3.1.4]: Hệ thống sử dụng role để hiển thị chức năng phù hợp.
+        <%--
+            UC-03 - Kiểm tra quyền truy cập
+            Main Flow [3.1.3]: Hệ thống lấy thông tin role của người dùng từ Session.
+            Main Flow [3.1.4]: Hệ thống sử dụng role để hiển thị chức năng phù hợp.
 
-                *note: phân quyền ở tần giao diện
-            --%>
-            <a href="TrangChu" class="${active_tab == 'sodo' ? 'active-tab' : ''}">
-                <i class="fa fa-th-large"></i> Sơ Đồ Bàn
+            note:
+            -  phân quyền ở tầng giao diện.
+
+        --%>
+
+        <a href="TrangChu" class="${active_tab == 'sodo' ? 'active-tab' : ''}">
+            <i class="fa fa-th-large"></i> Sơ Đồ Bàn
+        </a>
+
+        <c:if test="${sessionScope.role == 'Manager'}">
+            <a href="QuanLyMenu" class="${active_tab == 'menu' ? 'active-tab' : ''}">
+                <i class="fa fa-coffee"></i> Quản Lý Thực Đơn
             </a>
 
-            <c:if test="${sessionScope.role == 'Manager'}">
-                <a href="QuanLyMenu" class="${active_tab == 'menu' ? 'active-tab' : ''}">
-                    <i class="fa fa-coffee"></i> Quản Lý Thực Đơn
-                </a>
+            <a href="HoaDon" class="${active_tab == 'hoadon' ? 'active-tab' : ''}">
+                <i class="fa fa-file-text-o"></i> Hóa Đơn & Đặt Món
+            </a>
 
-                <a href="HoaDon" class="${active_tab == 'hoadon' ? 'active-tab' : ''}">
-                    <i class="fa fa-file-text-o"></i> Hóa Đơn & Đặt Món
-                </a>
+            <a href="QuanLyNhanVien" class="${active_tab == 'nhanvien' ? 'active-tab' : ''}">
+                <i class="fa fa-users"></i> Quản Lý Nhân Viên
+            </a>
 
-                <a href="QuanLyNhanVien" class="${active_tab == 'nhanvien' ? 'active-tab' : ''}">
-                    <i class="fa fa-users"></i> Quản Lý Nhân Viên
-                </a>
+            <a href="BaoCao" class="${active_tab == 'baocao' ? 'active-tab' : ''}">
+                <i class="fa fa-bar-chart"></i> Báo Cáo Doanh Thu
+            </a>
+        </c:if>
 
-                <a href="BaoCao" class="${active_tab == 'baocao' ? 'active-tab' : ''}">
-                    <i class="fa fa-bar-chart"></i> Báo Cáo Doanh Thu
-                </a>
-            </c:if>
+        <c:if test="${sessionScope.role == 'Staff'}">
+            <a href="QuanLyMenu" class="${active_tab == 'menu' ? 'active-tab' : ''}">
+                <i class="fa fa-coffee"></i> Quản Lý Thực Đơn
+            </a>
 
-            <c:if test="${sessionScope.role == 'Staff'}">
-                <a href="QuanLyMenu" class="${active_tab == 'menu' ? 'active-tab' : ''}">
-                    <i class="fa fa-coffee"></i> Quản Lý Thực Đơn
-                </a>
+            <a href="HoaDon" class="${active_tab == 'hoadon' ? 'active-tab' : ''}">
+                <i class="fa fa-file-text-o"></i> Hóa Đơn & Đặt Món
+            </a>
+        </c:if>
 
-                <a href="HoaDon" class="${active_tab == 'hoadon' ? 'active-tab' : ''}">
-                    <i class="fa fa-file-text-o"></i> Hóa Đơn & Đặt Món
-                </a>
-            </c:if>
+        <c:if test="${sessionScope.role == 'Cashier'}">
+            <a href="HoaDon" class="${active_tab == 'hoadon' ? 'active-tab' : ''}">
+                <i class="fa fa-file-text-o"></i> Hóa Đơn & Đặt Món
+            </a>
+        </c:if>
+    </aside>
 
-            <c:if test="${sessionScope.role == 'Cashier'}">
-                <a href="HoaDon" class="${active_tab == 'hoadon' ? 'active-tab' : ''}">
-                    <i class="fa fa-file-text-o"></i> Hóa Đơn & Đặt Món
-                </a>
-            </c:if>
-        </div>
-
-        <div class="col-md-10 mt-4">
+    <main class="main-content">
+        <div class="main-content-inner">
             <jsp:include page="${page_content}" />
         </div>
-    </div>
+    </main>
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>

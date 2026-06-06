@@ -11,7 +11,7 @@
     </div>
 
     <%-- ========== FORM ADD NV ============== --%>
-    <div class="card-custom">
+    <div class="card-custom ">
         <div class="card-header-custom">
             <i class="fa fa-user-plus"></i> Thêm nhân viên mới
         </div>
@@ -69,7 +69,7 @@
     </div>
 
     <%-- =========== LIST NV ==================== --%>
-    <div class="card-custom">
+    <div class="card-custom employee-list-card">
         <div class="card-header-custom">
             <i class="fa fa-list"></i> Danh sách nhân viên
         </div>
@@ -85,7 +85,7 @@
                 request.setAttribute("danhSachNhanVien", list);
             --%>
 
-            <div class="table-responsive">
+            <div class="employee-table-scroll">
                 <table class="table table-bordered table-hover">
                     <thead>
                     <tr>

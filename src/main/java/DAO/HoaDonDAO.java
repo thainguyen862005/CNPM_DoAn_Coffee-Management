@@ -325,4 +325,30 @@ public class HoaDonDAO {
         }
         return null;
     }
+    public boolean removeOrderDetail(int orderId, int itemId) {
+        String sql = "DELETE FROM order_details WHERE order_id = ? AND item_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ps.setInt(2, itemId);
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi khi xóa món khỏi order: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+    // Hàm xóa hoàn toàn hóa đơn (Sử dụng khi hóa đơn bị xóa hết món)
+    public void deleteOrder(int orderId) {
+        String sql = "DELETE FROM orders WHERE order_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Lỗi xóa hóa đơn trống: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

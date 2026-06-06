@@ -325,4 +325,18 @@ public class HoaDonDAO {
         }
         return null;
     }
+    public boolean removeOrderDetail(int orderId, int itemId) {
+        String sql = "DELETE FROM order_details WHERE order_id = ? AND item_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ps.setInt(2, itemId);
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi khi xóa món khỏi order: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
 }

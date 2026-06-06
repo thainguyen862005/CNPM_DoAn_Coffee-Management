@@ -9,14 +9,32 @@
 
         <table class="table table-bordered text-center mt-3">
             <thead class="table-light">
-            <tr><th>Tên món</th><th>Số lượng</th><th>Đơn giá</th></tr>
+            <tr>
+                <th>Tên món</th>
+                <th>Số lượng</th>
+                <th>Đơn giá</th>
+                <c:if test="${order.status != 'Đã thanh toán'}">
+                    <th>Thao tác</th>
+                </c:if>
+            </tr>
             </thead>
             <tbody>
             <c:forEach var="detail" items="${order.orderDetails}">
                 <tr>
-                    <td>${detail.menuItem.itemName}</td>
-                    <td>${detail.quantity}</td>
-                    <td>${detail.unitPrice}</td>
+                    <td class="align-middle">${detail.menuItem.itemName}</td>
+                    <td class="align-middle">${detail.quantity}</td>
+                    <td class="align-middle">${detail.unitPrice}</td>
+
+                    <c:if test="${order.status != 'Đã thanh toán'}">
+                        <td class="align-middle">
+                            <form action="HoaDon" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn hủy món này không?');" class="m-0">
+                                <input type="hidden" name="action" value="removeMenuItem">
+                                <input type="hidden" name="itemId" value="${detail.menuItem.itemId}">
+                                <input type="hidden" name="orderId" value="${order.orderId}">
+                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa fa-trash"></i> Hủy</button>
+                            </form>
+                        </td>
+                    </c:if>
                 </tr>
             </c:forEach>
             </tbody>
@@ -27,7 +45,6 @@
         <hr>
 
         <c:if test="${order.status != 'Đã thanh toán'}">
-            <hr>
             <div class="bg-light p-3 rounded border border-warning">
                 <div class="form-group row align-items-center">
                     <label class="col-sm-5 col-form-label fw-bold">Khách đưa (VNĐ):</label>

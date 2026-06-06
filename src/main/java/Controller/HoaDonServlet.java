@@ -141,8 +141,25 @@ public class HoaDonServlet extends HttpServlet {
             int orderId = Integer.parseInt(request.getParameter("orderId"));
             int itemId = Integer.parseInt(request.getParameter("itemId"));
 
+            // Xóa món khỏi chi tiết hóa đơn
             dao.removeOrderDetail(orderId, itemId);
-            response.sendRedirect("HoaDon?action=detail&id=" + orderId);
+
+            // Kịch bản xử lý thông minh: Kiểm tra nếu hóa đơn vừa xóa xong đã rỗng
+            Model.Order orderAfterRemove = dao.getOrderById(orderId);
+            if (orderAfterRemove != null && orderAfterRemove.getOrderDetails().isEmpty()) {
+                int tableId = dao.getTableIdByOrderId(orderId);
+
+                // Xóa tận gốc hóa đơn
+                dao.deleteOrder(orderId);
+
+                // Trả bàn về trạng thái Trống để đón khách khác
+                if (tableId > 0) {
+                    banDao.updateCoffeeTableStatus(tableId, "Trống");
+                }
+            }
+
+            // Fix lỗi Redirect: Điều hướng chuẩn về trang Quản Lý Hóa Đơn hiện hành
+            response.sendRedirect("HoaDon");
         }
     }
 }

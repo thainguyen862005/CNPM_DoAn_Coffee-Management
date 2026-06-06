@@ -339,4 +339,16 @@ public class HoaDonDAO {
         }
         return false;
     }
+    // Hàm xóa hoàn toàn hóa đơn (Sử dụng khi hóa đơn bị xóa hết món)
+    public void deleteOrder(int orderId) {
+        String sql = "DELETE FROM orders WHERE order_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Lỗi xóa hóa đơn trống: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
 }

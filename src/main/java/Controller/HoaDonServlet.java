@@ -66,10 +66,11 @@ public class HoaDonServlet extends HttpServlet {
             int orderId = Integer.parseInt(request.getParameter("orderId"));
             int tableId = Integer.parseInt(request.getParameter("tableId"));
             dao.thanhToanHoaDon(orderId, tableId);
-            response.sendRedirect("HoaDon");
+            response.getWriter().write("success");
+            return;
         }
         // LUỒNG 1: TẠO HÓA ĐƠN MỚI
-        if ("create".equals(action)) {
+        else if ("create".equals(action)) {
             // ĐIỀU KIỆN 1: PHÂN QUYỀN (ADMIN BỊ CHẶN - STAFF THÌ ĐƯỢC CHẠY TIẾP)
             jakarta.servlet.http.HttpSession session = request.getSession();
             String role = (String) session.getAttribute("role");
@@ -168,6 +169,20 @@ public class HoaDonServlet extends HttpServlet {
 
             // Fix lỗi Redirect: Điều hướng chuẩn về trang Quản Lý Hóa Đơn hiện hành
             response.sendRedirect("HoaDon");
+        }
+
+        else if ("chuyen_thanh_toan".equals(action)) {
+            int tableId = Integer.parseInt(request.getParameter("tableId"));
+
+            // Tìm cái hóa đơn của bàn này
+            Model.Order order = dao.getOrderByTableId(tableId);
+            if (order != null) {
+                // Đổi trạng thái nó sang "Chưa thanh toán"
+                dao.updateOrderStatus(order.getOrderId(), "Chưa thanh toán");
+            }
+
+            // Đá về lại Trang Chủ (Sơ đồ bàn) để nó tự tải lại màu Vàng
+            response.sendRedirect("TrangChu");
         }
     }
 }

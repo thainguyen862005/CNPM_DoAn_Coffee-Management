@@ -351,4 +351,17 @@ public class HoaDonDAO {
             e.printStackTrace();
         }
     }
+
+    // Hàm cập nhật nhanh trạng thái hóa đơn (Dùng cho Chuyển thanh toán)
+    public void updateOrderStatus(int orderId, String status) {
+        String sql = "UPDATE orders SET status = ? WHERE order_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, orderId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Lỗi cập nhật trạng thái: " + e.getMessage());
+        }
+    }
 }

@@ -27,7 +27,15 @@
     <h4><i class="fa fa-desktop"></i> HỆ THỐNG QUẢN LÝ QUÁN CAFE</h4>
     <div>
         <span><i class="fa fa-user-circle"></i> Xin chào: ${sessionScope.userDaDangNhap} </span>
-        <a href="login.jsp" class="btn btn-danger btn-sm ml-3"><i class="fa fa-sign-out"></i> Đăng xuất</a>
+
+        <%--
+            UC-02 - Đăng xuất
+            Main Flow [2.1.1]: Người dùng chọn chức năng Đăng xuất trên giao diện main_ui.jsp.
+            Main Flow [2.1.2]: Giao diện gửi yêu cầu đăng xuất đến LogoutServlet.
+        --%>
+        <a href="Logout" class="btn btn-danger btn-sm ml-3">
+            <i class="fa fa-sign-out"></i> Đăng xuất
+        </a>
     </div>
 </div>
 
@@ -35,8 +43,13 @@
     <div class="row">
         <div class="col-md-2 sidebar">
 
-            <%-- UC-03 - Phân quyền người dùng --%>
+            <%--
+                UC-03 - Kiểm tra quyền truy cập
+                Main Flow [3.1.3]: Hệ thống lấy thông tin role của người dùng từ Session.
+                Main Flow [3.1.4]: Hệ thống sử dụng role để hiển thị chức năng phù hợp.
 
+                *note: phân quyền ở tần giao diện
+            --%>
             <a href="TrangChu" class="${active_tab == 'sodo' ? 'active-tab' : ''}">
                 <i class="fa fa-th-large"></i> Sơ Đồ Bàn
             </a>

@@ -20,8 +20,9 @@
 
             <%--
                 UC-04 - Quản lý nhân viên
-                Main Flow [4.2.1]: Quản lý nhập thông tin nhân viên mới
-                Main Flow [4.2.2]: Gửi thông tin nhân viên đến QuanLyNhanVienServlet
+                Alternative Flow [4.2.1]: Giao diện hiển thị form nhập thông tin nhân viên mới.
+                Alternative Flow [4.2.2]: Quản lý nhập thông tin nhân viên và nhấn nút Lưu.
+                Alternative Flow [4.2.3]: Giao diện gửi dữ liệu đến QuanLyNhanVienServlet với action add.
             --%>
 
             <form action="QuanLyNhanVien" method="post">
@@ -77,7 +78,8 @@
 
             <%--
                 UC-04 - Quản lý nhân viên
-                Main Flow [4.1.4]: Hiển thị danh sách nhân viên
+                    Main Flow [4.1.6]: Servlet gửi danh sách nhân viên sang trang quan_ly_nhan_vien.jsp.
+                    Main Flow [4.1.7]: Giao diện hiển thị danh sách nhân viên cho Quản lý.
 
                 Servlet cần truyền:
                 request.setAttribute("danhSachNhanVien", list);
@@ -138,21 +140,22 @@
 
                                             <%--
                                                 UC-04 - Quản lý nhân viên
-                                                Main Flow [4.3.1]: Quản lý chọn nhân viên cần sửa
+                                                Alternative Flow [4.3.0]: Quản lý chọn nhân viên cần sửa.
+                                                Alternative Flow [4.3.1]: Giao diện hiển thị thông tin hiện tại của nhân viên.
                                             --%>
-
                                         <button class="btn btn-yellow btn-sm"
                                                 data-toggle="modal"
                                                 data-target="#editModal${nv.userId}">
                                             <i class="fa fa-pencil"></i> Sửa
                                         </button>
 
-                                            <%--
-                                                UC-04 - Quản lý nhân viên
-                                                Main Flow [4.4.1]: Quản lý chọn nhân viên cần xóa
-                                                Main Flow [4.4.2]: Gửi yêu cầu xóa nhân viên
-                                            --%>
-
+                                                    <%--
+                                                        UC-04 - Quản lý nhân viên
+                                                        Alternative Flow [4.4.0]: Quản lý chọn nhân viên cần xóa.
+                                                        Alternative Flow [4.4.1]: Hệ thống yêu cầu Quản lý xác nhận thao tác xóa.
+                                                        Alternative Flow [4.4.2]: Quản lý xác nhận xóa nhân viên.
+                                                        Alternative Flow [4.4.3]: Giao diện gửi yêu cầu đến QuanLyNhanVienServlet với action delete.
+                                                    --%>
                                         <form action="QuanLyNhanVien"
                                               method="post"
                                               style="display:inline-block;"
@@ -188,9 +191,9 @@
 
                                                         <%--
                                                             UC-04 - Quản lý nhân viên
-                                                            Main Flow [4.3.2]: Gửi thông tin cập nhật nhân viên
+                                                            Alternative Flow [4.3.2]: Quản lý chỉnh sửa thông tin và nhấn nút Cập nhật.
+                                                            Alternative Flow [4.3.3]: Giao diện gửi dữ liệu đến QuanLyNhanVienServlet với action update.
                                                         --%>
-
                                                     <input type="hidden" name="action" value="update">
                                                     <input type="hidden" name="userId" value="${nv.userId}">
 

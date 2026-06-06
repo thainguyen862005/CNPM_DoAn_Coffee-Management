@@ -1,7 +1,16 @@
 package Model;
 
-import java.util.List;
-import java.util.ArrayList;
+/*
+    Model Layer - User
+    - UC-01: Đăng nhập
+    - UC-03: Kiểm tra quyền truy cập
+    - UC-04: Quản lý nhân viên
+
+    Vai trò:
+    - User biểu diễn dữ liệu người dùng.
+    - fix lại code cũ bỏ xử lý login/logout/add/update/delete trong Model.
+    - chuyển các thao tác truy vấn và CRUD sang UserDAO.
+*/
 
 public class User {
 
@@ -10,9 +19,8 @@ public class User {
     private String password;
     private String role;
 
-    private static List<User> userList = new ArrayList<>();
-
-    public User() {}
+    public User() {
+    }
 
     public User(int userId, String username, String password, String role) {
         this.userId = userId;
@@ -21,38 +29,46 @@ public class User {
         this.role = role;
     }
 
-    public int getUserId() { return userId; }
-    public void setUserId(int userId) { this.userId = userId; }
-    public String getUsername() { return username; }
-    public void setUsername(String username) { this.username = username; }
-    public String getPassword() { return password; }
-    public void setPassword(String password) { this.password = password; }
-    public String getRole() { return role; }
-    public void setRole(String role) { this.role = role; }
-
-    // UC-01 : Đăng nhập
-    public boolean login() {
-        for (int i = 0; i < userList.size(); i++) {
-            User u = userList.get(i);
-            if (u.getUsername().equals(username) && u.getPassword().equals(password)) {
-                this.userId = u.getUserId();
-                this.role = u.getRole();
-                return true;
-            }
-        }
-        return false;
+    public int getUserId() {
+        return userId;
     }
 
-    // UC-02 : Đăng xuất
-    public void logout() {
-        System.out.println("Đăng xuất thành công!");
-        this.userId = 0;
-        this.username = null;
-        this.password = null;
-        this.role = null;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
-    // UC-03 : Phân quyền
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    /*
+    UC-03 - Kiểm tra quyền truy cập
+    Main Flow [3.1.3]: Hệ thống lấy thông tin role của người dùng từ Session.
+    Main Flow [3.1.4]: Servlet hoặc lớp xử lý so sánh role với quyền được phép truy cập chức năng.
+
+    note:
+    -  chỉ kiểm tra vai trò của User.
+*/
     public boolean isManager() {
         return role != null && role.equalsIgnoreCase("Manager");
     }
@@ -61,40 +77,15 @@ public class User {
         return role != null && role.equalsIgnoreCase("Staff");
     }
 
-    // UC-04 : Xem danh sách nhân viên
-    public List<User> getAllUsers() {
-        return userList;
+    public boolean isCashier() {
+        return role != null && role.equalsIgnoreCase("Cashier");
     }
-
-    // UC-04 : Thêm nhân viên
-    public boolean addUser(User user) {
-        return userList.add(user);
-    }
-
-    // UC-04 : Cập nhật nhân viên
-    public boolean updateUser(User user) {
-        for (int i = 0; i < userList.size(); i++) {
-            if (userList.get(i).getUserId() == user.getUserId()) {
-                userList.set(i, user);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    // UC-04 : Xóa nhân viên (ĐÃ SỬA LỖI VÒNG LẶP)
-    public boolean deleteUser(int userId) {
-        for (int i = 0; i < userList.size(); i++) {
-            if (userList.get(i).getUserId() == userId) {
-                userList.remove(i);
-                return true;
-            }
-        }
-        return false;
-    }
-
     @Override
     public String toString() {
-        return "ID: " + userId + " | Username: " + username + " | Role: " + role;
+        return "User{" +
+                "userId=" + userId +
+                ", username='" + username + '\'' +
+                ", role='" + role + '\'' +
+                '}';
     }
 }

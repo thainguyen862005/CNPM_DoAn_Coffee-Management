@@ -27,11 +27,10 @@
         <div class="card-body">
 
             <%--
-                UC-03 - Phân quyền người dùng
-                Alternative Flow [3A.2]: Hệ thống hiển thị Access Denied
-                khi người dùng không đủ quyền truy cập chức năng.
+                UC-03 - Kiểm tra quyền truy cập
+                Alternative Flow [3.3.2]: Hệ thống hiển thị trang access_denied.jsp
+                hoặc thông báo “Bạn không có quyền truy cập chức năng này”.
             --%>
-
             <div class="denied-icon">
                 <i class="fa fa-lock"></i>
             </div>

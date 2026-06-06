@@ -67,6 +67,66 @@ public class UserDAO {
     }
 
     /*
+    UC-04 - Quản lý nhân viên
+
+    Alternative Flow [4.7.2 - 4.7.3]: UserDAO tìm kiếm nhân viên theo từ khóa username trong bảng users.
+    Alternative Flow [4.8.2 - 4.8.3]: UserDAO lọc danh sách nhân viên theo role trong bảng users.
+    Alternative Flow [4.9.1]: Nếu không có nhân viên thỏa điều kiện, danh sách trả về sẽ rỗng.
+
+    note:
+    - keyword rỗng + role rỗng: lấy tất cả nhân viên.
+    - keyword có + role rỗng: tìm theo username.
+    - keyword rỗng + role có: lọc theo role.
+    - keyword có + role có: tìm theo username và lọc theo role.
+*/
+    public List<User> searchAndFilterUsers(String keyword, String role) {
+        List<User> list = new ArrayList<>();
+
+        StringBuilder sql = new StringBuilder(
+                "SELECT user_id, username, password, role FROM users WHERE 1=1"
+        );
+
+        boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
+        boolean hasRole = role != null && !role.trim().isEmpty();
+
+        if (hasKeyword) {
+            sql.append(" AND username LIKE ?");
+        }
+
+        if (hasRole) {
+            sql.append(" AND role = ?");
+        }
+
+        sql.append(" ORDER BY user_id ASC");
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+
+            int index = 1;
+
+            if (hasKeyword) {
+                ps.setString(index++, "%" + keyword.trim() + "%");
+            }
+
+            if (hasRole) {
+                ps.setString(index++, role.trim());
+            }
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(mapResultSetToUser(rs));
+                }
+            }
+
+        } catch (Exception e) {
+            System.out.println("Lỗi UC-04 khi tìm kiếm/lọc nhân viên: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    /*
         UC-04 - Quản lý nhân viên
         Alternative Flow [4.5.1]: Servlet phát hiện username bị trùng.
     */

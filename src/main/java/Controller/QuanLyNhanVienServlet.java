@@ -125,16 +125,43 @@ public class QuanLyNhanVienServlet extends HttpServlet {
     }
 
     /*
-        UC-04 - Quản lý nhân viên
-        Main Flow [4.1.3]: Servlet gọi UserDAO.getAllUsers().
-        Main Flow [4.1.6]: Servlet gửi danh sách nhân viên sang trang quan_ly_nhan_vien.jsp.
-        Main Flow [4.1.7]: Giao diện hiển thị danh sách nhân viên cho Quản lý.
-    */
+    UC-04 - Quản lý nhân viên
+
+    Main Flow [4.1.3]: Servlet gọi UserDAO để lấy danh sách nhân viên.
+    Main Flow [4.1.6]: Servlet gửi danh sách nhân viên sang trang quan_ly_nhan_vien.jsp.
+    Main Flow [4.1.7]: Giao diện hiển thị danh sách nhân viên cho Quản lý.
+
+    Alternative Flow [4.7.0 - 4.7.5]: Xử lý tìm kiếm nhân viên theo username.
+    Alternative Flow [4.8.0 - 4.8.5]: Xử lý lọc nhân viên theo role.
+    Alternative Flow [4.9.0 - 4.9.3]: Nếu không có kết quả, Servlet gửi danh sách rỗng để JSP hiển thị thông báo.
+*/
     private void loadEmployeeList(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<User> users = userDAO.getAllUsers();
 
+    /*
+        UC-04 - Alternative Flow [4.7.1] và [4.8.1]: Nhận keyword và role từ form tìm kiếm/lọc trên quan_ly_nhan_vien.jsp.
+    */
+        String keyword = request.getParameter("keyword");
+        String role = request.getParameter("role");
+
+    /*
+        UC-04 - Main Flow [4.1.3] kết hợp Alternative Flow [4.7.2] và [4.8.2]:
+        - Gọi UserDAO.searchAndFilterUsers(keyword, role).
+        - Nếu keyword/role rỗng, DAO sẽ trả về toàn bộ danh sách nhân viên.
+    */
+        List<User> users = userDAO.searchAndFilterUsers(keyword, role);
+
+    /*
+        UC-04 - Main Flow [4.1.6]: Gửi danh sách nhân viên sang quan_ly_nhan_vien.jsp.
+    */
         request.setAttribute("danhSachNhanVien", users);
+
+    /*
+        Giữ lại điều kiện tìm kiếm/lọc để JSP hiển thị lại trên form sau khi submit.
+    */
+        request.setAttribute("keyword", keyword == null ? "" : keyword.trim());
+        request.setAttribute("selectedRole", role == null ? "" : role.trim());
+
         request.setAttribute("page_content", "quan_ly_nhan_vien.jsp");
         request.setAttribute("active_tab", "nhanvien");
 

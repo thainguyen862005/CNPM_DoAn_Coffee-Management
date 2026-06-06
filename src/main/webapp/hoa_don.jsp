@@ -60,7 +60,6 @@
                                     <button type="button"
                                             class="btn btn-sm btn-info text-white"
                                             data-toggle="modal" data-target="#chiTietModal"
-                                            data-bs-toggle="modal" data-bs-target="#chiTietModal"
                                             onclick="taiDuLieuChiTiet(${order.orderId})">
                                         <i class="bi bi-eye"></i> Chi tiết
                                     </button>

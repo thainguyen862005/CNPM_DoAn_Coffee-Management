@@ -13,32 +13,30 @@
                     <p>Khu vực: ${ban.area}</p>
 
                     <c:choose>
-                        <%-- TRẠNG THÁI 1: TRỐNG --%>
+                        <%-- TRẠNG THÁI 1: TRỐNG (MÀU XANH) --%>
                         <c:when test="${ban.status eq 'Trống'}">
                             <span class="badge badge-success"><i class="fa fa-check"></i> Trống</span>
                             <a href="HoaDon?action=new&tableId=${ban.tableId}" class="btn btn-outline-primary btn-sm mt-2 btn-block">Gọi Món</a>
                         </c:when>
 
-                        <%-- TRẠNG THÁI 2: ĐANG PHỤC VỤ --%>
+                        <%-- TRẠNG THÁI 2: ĐANG PHỤC VỤ (MÀU ĐỎ) --%>
                         <c:when test="${ban.status eq 'Đang phục vụ'}">
                             <span class="badge badge-danger"><i class="fa fa-fire"></i> Đang phục vụ</span>
-                            <form action="HoaDon" method="POST" class="mt-2">
-                                <input type="hidden" name="action" value="request_payment">
+                            <form action="HoaDon" method="POST" class="m-0 mt-2">
+                                <input type="hidden" name="action" value="chuyen_thanh_toan">
                                 <input type="hidden" name="tableId" value="${ban.tableId}">
-                                <button type="submit" class="btn btn-outline-warning btn-sm btn-block">Chuyển Thanh Toán</button>
+                                <button type="submit" class="btn btn-outline-warning btn-sm btn-block">
+                                    <i class="fa fa-share"></i> Chuyển thanh toán
+                                </button>
                             </form>
                         </c:when>
 
-                        <%-- TRẠNG THÁI 3: CHƯA THANH TOÁN --%>
-                        <c:when test="${ban.status eq 'Chưa thanh toán'}">
-                            <span class="badge badge-warning text-dark"><i class="fa fa-exclamation-circle"></i> Chưa thanh toán</span>
-                            <button type="button" onclick="moPopupThanhToan(${ban.tableId})" class="btn btn-outline-info btn-sm mt-2 btn-block">Thanh Toán</button>
-                        </c:when>
-
-                        <%-- PHÒNG HỜ CÁC TRẠNG THÁI KHÁC NẾU CÓ --%>
+                        <%-- TRẠNG THÁI 3: CHƯA THANH TOÁN (MÀU VÀNG) --%>
                         <c:otherwise>
-                            <span class="badge badge-secondary">${ban.status}</span>
-                            <button class="btn btn-outline-secondary btn-sm mt-2 btn-block">Xem</button>
+                            <span class="badge badge-warning text-dark"><i class="fa fa-clock-o"></i> Chưa thanh toán</span>
+                            <button type="button" class="btn btn-warning btn-sm mt-2 btn-block text-dark font-weight-bold" onclick="moPopupThanhToan(${ban.tableId})">
+                                <i class="fa fa-calculator"></i> Thanh toán
+                            </button>
                         </c:otherwise>
                     </c:choose>
                 </div>

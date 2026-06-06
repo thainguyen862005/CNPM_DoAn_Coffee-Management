@@ -4,9 +4,21 @@
 <div class="container-fluid mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Quản lý hóa đơn</h2>
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#taoHoaDonModal">
-            + Tạo hóa đơn mới
-        </button>
+        <c:choose>
+            <%-- THÀNH PHẦN 1: Nếu là Admin hoặc Manager -> BLOCK (Khóa nút, không cho bấm) --%>
+            <c:when test="${sessionScope.role == 'Admin' || sessionScope.role == 'Manager'}">
+                <button type="button" class="btn btn-secondary" disabled title="Tài khoản Admin không có quyền tạo đơn">
+                    + Tạo hóa đơn mới
+                </button>
+            </c:when>
+
+            <%-- THÀNH PHẦN 2: Ngược lại (Staff/Thu ngân...) -> MỞ (Bấm bình thường) --%>
+            <c:otherwise>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#taoHoaDonModal">
+                    + Tạo hóa đơn mới
+                </button>
+            </c:otherwise>
+        </c:choose>
     </div>
 
     <div class="card shadow">
@@ -111,10 +123,19 @@
                         <label class="fw-bold mb-2">1. Chọn khu vực / Bàn phục vụ:</label>
                         <select name="tableId" class="form-select form-control">
                             <option value="0">🛒 Mua mang đi (Takeaway)</option>
-                            <c:forEach var="table" items="${listTable}">
-                                <option value="${table.tableId}">
-                                    [${table.status}] - ${table.tableName} (${table.area})
-                                </option>
+                            <c:forEach items="${listTable}" var="table">
+                                <c:choose>
+                                    <%-- ĐIỀU KIỆN: Nếu bàn trống thì mới cho chọn --%>
+                                    <c:when test="${table.status == 'Trống'}">
+                                        <option value="${table.tableId}">${table.tableName} (Khu vực: ${table.area})</option>
+                                    </c:when>
+                                    <%-- NGƯỢC LẠI: Bàn đang phục vụ / chưa thanh toán thì làm mờ (disabled) --%>
+                                    <c:otherwise>
+                                        <option value="${table.tableId}" disabled>
+                                                ${table.tableName} - Đang bận (${table.status})
+                                        </option>
+                                    </c:otherwise>
+                                </c:choose>
                             </c:forEach>
 
                         </select>

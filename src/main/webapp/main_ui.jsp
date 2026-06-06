@@ -47,6 +47,15 @@
         <c:if test="${sessionScope.role == 'Manager'}">
             <a href="QuanLyMenu" class="${active_tab == 'menu' ? 'active-tab' : ''}">
                 <i class="fa fa-coffee"></i> Quản Lý Thực Đơn
+            <%--
+                UC-03 - Kiểm tra quyền truy cập
+                Main Flow [3.1.3]: Hệ thống lấy thông tin role của người dùng từ Session.
+                Main Flow [3.1.4]: Hệ thống sử dụng role để hiển thị chức năng phù hợp.
+
+                *note: phân quyền ở tần giao diện
+            --%>
+            <a href="TrangChu" class="${active_tab == 'sodo' ? 'active-tab' : ''}">
+                <i class="fa fa-th-large"></i> Sơ Đồ Bàn
             </a>
 
             <a href="HoaDon" class="${active_tab == 'hoadon' ? 'active-tab' : ''}">

@@ -11,7 +11,7 @@ import java.util.List;
 // Khai báo Class bọc ngoài các phương thức
 public class MenuItemDAO {
 
-    public void themMonAn(MenuItem mon) {
+    public void AddMenuItem(MenuItem mon) {
         String sql = "INSERT INTO menu_items (item_ID,item_name, price, description, status) VALUES (?, ?, ?, ?, ?)";
 
         // Đã thêm lại chữ "try ("

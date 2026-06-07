@@ -29,61 +29,28 @@
 
 <div class="app-body">
     <aside class="sidebar">
-
-        <%--
-            UC-03 - Kiểm tra quyền truy cập
-            Main Flow [3.1.3]: Hệ thống lấy thông tin role của người dùng từ Session.
-            Main Flow [3.1.4]: Hệ thống sử dụng role để hiển thị chức năng phù hợp.
-
-            note:
-            -  phân quyền ở tầng giao diện.
-
-        --%>
-
+        <%-- CHỨC NĂNG CHUNG: Ai cũng được xem (Trang chủ & Hóa đơn) --%>
         <a href="TrangChu" class="${active_tab == 'sodo' ? 'active-tab' : ''}">
             <i class="fa fa-th-large"></i> Sơ Đồ Bàn
         </a>
+        <a href="HoaDon" class="${active_tab == 'hoadon' ? 'active-tab' : ''}">
+            <i class="fa fa-file-text-o"></i> Hóa Đơn & Đặt Món
+        </a>
 
-        <c:if test="${sessionScope.role == 'Manager'}">
+        <%-- QUẢN LÝ THỰC ĐƠN: Dành cho Manager và Staff --%>
+        <c:if test="${sessionScope.role == 'Manager' || sessionScope.role == 'Staff'}">
             <a href="QuanLyMenu" class="${active_tab == 'menu' ? 'active-tab' : ''}">
                 <i class="fa fa-coffee"></i> Quản Lý Thực Đơn
-            <%--
-                UC-03 - Kiểm tra quyền truy cập
-                Main Flow [3.1.3]: Hệ thống lấy thông tin role của người dùng từ Session.
-                Main Flow [3.1.4]: Hệ thống sử dụng role để hiển thị chức năng phù hợp.
-
-                *note: phân quyền ở tần giao diện
-            --%>
-            <a href="TrangChu" class="${active_tab == 'sodo' ? 'active-tab' : ''}">
-                <i class="fa fa-th-large"></i> Sơ Đồ Bàn
             </a>
+        </c:if>
 
-            <a href="HoaDon" class="${active_tab == 'hoadon' ? 'active-tab' : ''}">
-                <i class="fa fa-file-text-o"></i> Hóa Đơn & Đặt Món
-            </a>
-
+        <%-- QUẢN LÝ CẤP CAO: Chỉ dành cho Manager --%>
+        <c:if test="${sessionScope.role == 'Manager'}">
             <a href="QuanLyNhanVien" class="${active_tab == 'nhanvien' ? 'active-tab' : ''}">
                 <i class="fa fa-users"></i> Quản Lý Nhân Viên
             </a>
-
             <a href="BaoCao" class="${active_tab == 'baocao' ? 'active-tab' : ''}">
                 <i class="fa fa-bar-chart"></i> Báo Cáo Doanh Thu
-            </a>
-        </c:if>
-
-        <c:if test="${sessionScope.role == 'Staff'}">
-            <a href="QuanLyMenu" class="${active_tab == 'menu' ? 'active-tab' : ''}">
-                <i class="fa fa-coffee"></i> Quản Lý Thực Đơn
-            </a>
-
-            <a href="HoaDon" class="${active_tab == 'hoadon' ? 'active-tab' : ''}">
-                <i class="fa fa-file-text-o"></i> Hóa Đơn & Đặt Món
-            </a>
-        </c:if>
-
-        <c:if test="${sessionScope.role == 'Cashier'}">
-            <a href="HoaDon" class="${active_tab == 'hoadon' ? 'active-tab' : ''}">
-                <i class="fa fa-file-text-o"></i> Hóa Đơn & Đặt Món
             </a>
         </c:if>
     </aside>

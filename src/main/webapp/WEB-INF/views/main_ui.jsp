@@ -103,7 +103,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
-    // 1. Tự động tính tiền thối khi gõ số
+    // [UC-18] Tính tổng tiền (Extension): Xử lý logic tính tiền thối lại dựa trên số tiền khách đưa
     function tinhTienThoi(tongTien) {
         let khachDua = document.getElementById('tienKhachDua').value;
         let tienThoi = khachDua - tongTien;
@@ -111,7 +111,7 @@
         document.getElementById('tienThoiLai').value = tienThoi.toLocaleString('vi-VN') + " đ";
     }
 
-    // 2. Dùng AJAX để thanh toán không chuyển trang
+    // [UC-12] Thanh toán hóa đơn: Gửi request bất đồng bộ (AJAX) để không phải reload trang
     function thucHienThanhToan(event, tongTien) {
         // Chặn không cho form load sang trang khác
         event.preventDefault();
@@ -126,7 +126,7 @@
             let form = event.target;
             let formData = new URLSearchParams(new FormData(form));
 
-            // Gửi ngầm dữ liệu xuống HoaDonServlet
+            // [UC-12] Bước 1.5: Gọi Fetch API đẩy data xuống HoaDonServlet
             fetch('HoaDon', {
                 method: 'POST',
                 body: formData

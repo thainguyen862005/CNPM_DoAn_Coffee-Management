@@ -41,7 +41,7 @@
                 Tài khoản hiện tại không được phép sử dụng chức năng này.
             </p>
 
-            <a href="TrangChu" class="btn btn-primary">
+                <a href="${pageContext.request.contextPath}/TrangChu" class="btn btn-primary">
                 <i class="fa fa-home"></i> Về trang chủ
             </a>
         </div>

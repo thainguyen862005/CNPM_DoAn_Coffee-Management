@@ -19,8 +19,11 @@ public class UserDAO {
         Alternative Flow [1.3.1]: UserDAO không tìm thấy tài khoản phù hợp trong cơ sở dữ liệu.
     */
     public User findByUsernameAndPassword(String username, String password) {
-        String sql = "SELECT user_id, username, password, role FROM users WHERE username = ? AND password = ?";
-
+        String sql =
+                "SELECT user_id, username, password, role " +
+                        "FROM users " +
+                        "WHERE BINARY username = ? " +
+                        "AND BINARY password = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
 
@@ -131,7 +134,7 @@ public class UserDAO {
         Alternative Flow [4.5.1]: Servlet phát hiện username bị trùng.
     */
     public boolean isUsernameExists(String username) {
-        String sql = "SELECT user_id FROM users WHERE username = ?";
+        String sql = "SELECT user_id FROM users WHERE BINARY username = ?";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

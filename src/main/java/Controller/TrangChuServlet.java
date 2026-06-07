@@ -2,12 +2,12 @@ package Controller;
 
 import DAO.so_do_banDAO;
 import Model.CoffeeTable;
+import Util.AuthUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.util.List;
 
@@ -15,9 +15,14 @@ import java.util.List;
 public class TrangChuServlet extends HttpServlet {
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Kiểm tra xem đã đăng nhập chưa, chưa thì đuổi về login
-        if (request.getSession().getAttribute("userDaDangNhap") == null) {
-            response.sendRedirect("login.jsp");
+        /*
+        UC-03 - Alternative Flow [3.2.0 - 3.2.3]:
+
+            - Kiểm tra Session hiện tại của người dùng.
+            - Nếu Session không tồn tại hoặc chưa có thông tin đăng nhập, AuthUtil sẽ điều hướng người dùng về login.jsp.
+            -> return dùng để dừng toàn bộ xử lý phía dưới.
+*/
+        if (!AuthUtil.checkLogin(request, response)) {
             return;
         }
 
@@ -29,6 +34,6 @@ public class TrangChuServlet extends HttpServlet {
         request.setAttribute("danhSachBan", dsBan);
         request.setAttribute("page_content", "so_do_ban.jsp");
         request.setAttribute("active_tab", "sodo");
-        request.getRequestDispatcher("main_ui.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/main_ui.jsp").forward(request, response);
     }
 }

@@ -28,38 +28,76 @@
 </div>
 
 <div class="app-body">
+
     <aside class="sidebar">
-        <%-- CHỨC NĂNG CHUNG: Ai cũng được xem (Trang chủ & Hóa đơn) --%>
         <a href="TrangChu" class="${active_tab == 'sodo' ? 'active-tab' : ''}">
             <i class="fa fa-th-large"></i> Sơ Đồ Bàn
         </a>
-        <a href="HoaDon" class="${active_tab == 'hoadon' ? 'active-tab' : ''}">
-            <i class="fa fa-file-text-o"></i> Hóa Đơn & Đặt Món
-        </a>
 
-        <%-- QUẢN LÝ THỰC ĐƠN: Dành cho Manager và Staff --%>
-        <c:if test="${sessionScope.role == 'Manager' || sessionScope.role == 'Staff'}">
-            <a href="QuanLyMenu" class="${active_tab == 'menu' ? 'active-tab' : ''}">
-                <i class="fa fa-coffee"></i> Quản Lý Thực Đơn
-            </a>
-        </c:if>
+            <%--
+                UC-03 - KIỂM TRA QUYỀN TRUY CẬP Ở TẦNG GIAO DIỆN
 
-        <%-- QUẢN LÝ CẤP CAO: Chỉ dành cho Manager --%>
-        <c:if test="${sessionScope.role == 'Manager'}">
-            <a href="QuanLyNhanVien" class="${active_tab == 'nhanvien' ? 'active-tab' : ''}">
-                <i class="fa fa-users"></i> Quản Lý Nhân Viên
-            </a>
-            <a href="BaoCao" class="${active_tab == 'baocao' ? 'active-tab' : ''}">
-                <i class="fa fa-bar-chart"></i> Báo Cáo Doanh Thu
-            </a>
-        </c:if>
+                Main Flow [3.1.3]: Hệ thống lấy role của người dùng từ Session.
+                Main Flow [3.1.4]:Hệ thống dựa vào role để hiển thị các chức năng phù hợp.
+
+                note:
+                - chỉ phân quyền hiển thị trên giao diện.
+            --%>
+
+            <%--
+                Chức năng Quản lý thực đơn: Chỉ tài khoản có role Manager được hiển thị.
+            --%>
+            <c:if test="${sessionScope.role == 'Manager'}">
+                <a href="QuanLyMenu"
+                   class="${active_tab == 'menu' ? 'active-tab' : ''}">
+                    <i class="fa fa-coffee"></i> Quản Lý Thực Đơn
+                </a>
+            </c:if>
+
+            <%--
+                Chức năng Hóa đơn và Đặt món:
+                - Manager: được xem và theo dõi hoạt động hóa đơn.
+                - Staff: được tạo và cập nhật order.
+                - Cashier: được xem và thanh toán hóa đơn.
+                Quyền thực hiện từng action cụ thể vẫn được kiểm tra trong HoaDonServlet.
+            --%>
+            <c:if test="${sessionScope.role == 'Manager'
+              || sessionScope.role == 'Staff'
+              || sessionScope.role == 'Cashier'}">
+
+                <a href="HoaDon"
+                   class="${active_tab == 'hoadon' ? 'active-tab' : ''}">
+                    <i class="fa fa-file-text-o"></i> Hóa Đơn & Đặt Món
+                </a>
+            </c:if>
+
+            <%--
+                UC-04 - Quản lý nhân viên:
+                Preconditions: Người dùng đã đăng nhập và có role Manager -> Chỉ Manager được hiển thị chức năng này.
+            --%>
+            <c:if test="${sessionScope.role == 'Manager'}">
+                <a href="QuanLyNhanVien"
+                   class="${active_tab == 'nhanvien' ? 'active-tab' : ''}">
+                    <i class="fa fa-users"></i> Quản Lý Nhân Viên
+                </a>
+            </c:if>
+
+            <%--
+                Chức năng Báo cáo doanh thu: Chỉ tài khoản có role Manager được hiển thị.
+            --%>
+            <c:if test="${sessionScope.role == 'Manager'}">
+                <a href="BaoCao"
+                   class="${active_tab == 'baocao' ? 'active-tab' : ''}">
+                    <i class="fa fa-bar-chart"></i> Báo Cáo Doanh Thu
+                </a>
+            </c:if>
     </aside>
-
     <main class="main-content">
         <div class="main-content-inner">
-            <jsp:include page="${page_content}" />
+            <jsp:include page="/WEB-INF/views/${page_content}" />
         </div>
     </main>
+
 </div>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>

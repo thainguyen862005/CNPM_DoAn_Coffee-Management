@@ -13,7 +13,13 @@
                 <th>Tên món</th>
                 <th>Số lượng</th>
                 <th>Đơn giá</th>
-                <c:if test="${order.status != 'Đã thanh toán'}">
+                    <%--
+                UC-03 - Kiểm tra quyền thao tác trên chi tiết order.
+
+                Chỉ Staff được thay đổi món trong order chưa thanh toán.Manager và Cashier chỉ xem danh sách món.
+                --%>
+                <c:if test="${order.status != 'Đã thanh toán'
+              && sessionScope.role == 'Staff'}">
                     <th>Thao tác</th>
                 </c:if>
             </tr>
@@ -25,15 +31,36 @@
                     <td class="align-middle">${detail.quantity}</td>
                     <td class="align-middle">${detail.unitPrice}</td>
 
-                    <c:if test="${order.status != 'Đã thanh toán'}">
+                        <%--
+        UC-03 - KIỂM TRA QUYỀN HỦY MÓN
+
+        Điều kiện:
+        - Hóa đơn chưa thanh toán.
+        - Người dùng có role Staff.
+
+        HoaDonServlet vẫn phải kiểm tra lại role Staff
+        khi nhận action=removeMenuItem.
+    --%>
+                    <c:if test="${order.status != 'Đã thanh toán'
+              && sessionScope.role == 'Staff'}">
+
                         <td class="align-middle">
-                            <form action="HoaDon" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn hủy món này không?');" class="m-0">
+                            <form action="HoaDon" method="post" onsubmit="
+                            return confirm('Bạn có chắc chắn muốn hủy món này không?');" class="m-0">
+
                                 <input type="hidden" name="action" value="removeMenuItem">
+
                                 <input type="hidden" name="itemId" value="${detail.menuItem.itemId}">
+
                                 <input type="hidden" name="orderId" value="${order.orderId}">
-                                <button type="submit" class="btn btn-sm btn-outline-danger"><i class="fa fa-trash"></i> Hủy</button>
+
+                                <button type="submit" class="btn btn-sm btn-outline-danger">
+                                    <i class="fa fa-trash"></i>
+                                    Hủy
+                                </button>
                             </form>
                         </td>
+
                     </c:if>
                 </tr>
             </c:forEach>
@@ -44,23 +71,26 @@
 
         <hr>
 
-        <c:if test="${order.status != 'Đã thanh toán'}">
+        <c:if test="${order.status != 'Đã thanh toán' && sessionScope.role == 'Cashier'}">
             <div class="bg-light p-3 rounded border border-warning">
                 <div class="form-group row align-items-center">
                     <label class="col-sm-5 col-form-label fw-bold">Khách đưa (VNĐ):</label>
                     <div class="col-sm-7">
-                        <input type="number" id="tienKhachDua" class="form-control" oninput="tinhTienThoi(${order.calculateTotal()})" placeholder="Nhập tiền khách đưa...">
+                        <input type="number" id="tienKhachDua" class="form-control"
+                               oninput="tinhTienThoi(${order.calculateTotal()})" placeholder="Nhập tiền khách đưa...">
                     </div>
                 </div>
                 <div class="form-group row mt-2 align-items-center">
                     <label class="col-sm-5 col-form-label fw-bold">Tiền thối lại:</label>
                     <div class="col-sm-7">
-                        <input type="text" id="tienThoiLai" class="form-control text-danger font-weight-bold" readonly value="0 đ">
+                        <input type="text" id="tienThoiLai" class="form-control text-danger font-weight-bold" readonly
+                               value="0 đ">
                     </div>
                 </div>
             </div>
 
-            <form id="formThanhToan" class="text-center mt-3" onsubmit="return thucHienThanhToan(event, ${order.calculateTotal()});">
+            <form id="formThanhToan" class="text-center mt-3"
+                  onsubmit="return thucHienThanhToan(event, ${order.calculateTotal()});">
                 <input type="hidden" name="action" value="thanh_toan">
                 <input type="hidden" name="tableId" value="${order.table != null ? order.table.tableId : 0}">
                 <input type="hidden" name="orderId" value="${order.orderId}">

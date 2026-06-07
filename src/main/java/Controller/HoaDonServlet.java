@@ -3,6 +3,7 @@ package Controller;
 import DAO.HoaDonDAO;
 import DAO.so_do_banDAO;
 import Model.Order;
+import Util.AuthUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -17,6 +18,21 @@ public class HoaDonServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+        /*
+            UC-03 - KIỂM TRA QUYỀN TRUY CẬP
+
+            [3.1.2] Kiểm tra Session hiện tại.
+            [3.1.5] Nếu người dùng đã đăng nhập thì cho phép tiếp tục xem danh sách hoặc chi tiết hóa đơn.
+
+            Alternative Flow [3.2.0 - 3.2.3]:
+                - Nếu chưa đăng nhập thì điều hướng về login.jsp.
+                - Dừng toàn bộ request.
+           */
+        if (!AuthUtil.checkLogin(request, response)) {
+            return;
+        }
+
         String action = request.getParameter("action");
         HoaDonDAO dao = new HoaDonDAO();
 
@@ -27,7 +43,7 @@ public class HoaDonServlet extends HttpServlet {
                 Order order = dao.getOrderById(orderId);
                 request.setAttribute("order", order);
             }
-            request.getRequestDispatcher("chi_tiet_hoa_don.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/chi_tiet_hoa_don.jsp").forward(request, response);
         }
         else if ("detail_by_table".equals(action)) {
             String tableIdParam = request.getParameter("tableId");
@@ -36,7 +52,7 @@ public class HoaDonServlet extends HttpServlet {
                 Order order = dao.getOrderByTableId(tableId);
                 request.setAttribute("order", order);
             }
-            request.getRequestDispatcher("chi_tiet_hoa_don.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/chi_tiet_hoa_don.jsp").forward(request, response);
         }
         else {
             List<Order> listHoaDon = dao.getAllOrders();
@@ -49,7 +65,7 @@ public class HoaDonServlet extends HttpServlet {
 
             request.setAttribute("page_content", "hoa_don.jsp");
             request.setAttribute("active_tab", "hoadon");
-            request.getRequestDispatcher("main_ui.jsp").forward(request, response);
+            request.getRequestDispatcher("/WEB-INF/views/main_ui.jsp").forward(request, response);
         }
     }
 
@@ -58,11 +74,24 @@ public class HoaDonServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
 
+        if (!AuthUtil.checkLogin(request, response)) {
+            return;
+        }
+
         String action = request.getParameter("action");
         HoaDonDAO dao = new HoaDonDAO();
         so_do_banDAO banDao = new so_do_banDAO();
 
         if ("thanh_toan".equals(action)) {
+
+            /*
+                UC-03 - Kiểm tra quyền thanh toán hóa đơn.
+                Cashier là tác nhân thực hiện nghiệp vụ thanh toán. Manager và Staff không được gửi trực tiếp action thanh_toan.
+            */
+            if (!AuthUtil.checkRole(request, response, "Cashier")) {
+                return;
+            }
+
             int orderId = Integer.parseInt(request.getParameter("orderId"));
             int tableId = Integer.parseInt(request.getParameter("tableId"));
             dao.thanhToanHoaDon(orderId, tableId);
@@ -71,14 +100,23 @@ public class HoaDonServlet extends HttpServlet {
         }
         // [UC-05] MAIN FLOW: Tạo Order
         else if ("create".equals(action)) {
-            // ĐIỀU KIỆN 1: PHÂN QUYỀN (ADMIN BỊ CHẶN - STAFF THÌ ĐƯỢC CHẠY TIẾP)
-            jakarta.servlet.http.HttpSession session = request.getSession();
-            String role = (String) session.getAttribute("role");
+            /*
+                UC-03 - KIỂM TRA QUYỀN TẠO HÓA ĐƠN
 
-            // Nếu người dùng là Admin hoặc Manager -> Hệ thống chặn lại lập tức
-            if (role != null && (role.equalsIgnoreCase("Admin"))) {
-                response.sendRedirect("HoaDon?error=unauthorized");
-                return; // Gặp lệnh này Admin sẽ bị dừng luồng và đẩy ra ngoài ngay lập tức
+                Nghiệp vụ:
+                - Staff là nhân viên phục vụ, được phép tạo order.
+                - Manager và Cashier không được thực hiện action create.
+
+                [3.1.3] Lấy role từ Session.
+                [3.1.4] So sánh role với quyền Staff.
+                [3.1.5] Nếu đúng role thì tiếp tục tạo hóa đơn.
+
+                Alternative Flow [3.3.0 - 3.3.3]:
+                - Nếu không phải Staff thì hiển thị access_denied.jsp.
+                - Dừng xử lý request.
+            */
+            if (!AuthUtil.checkRole(request, response, "Staff")) {
+                return;
             }
             // ĐIỀU KIỆN 2: BẢO VỆ BÀN PHỤC VỤ (BÀN CHƯA THANH TOÁN THÌ KHÔNG ĐƯỢC ĐẶT)
             String tableIdParam = request.getParameter("tableId");
@@ -115,6 +153,15 @@ public class HoaDonServlet extends HttpServlet {
         }
         // [UC-06] MAIN FLOW: Cập nhật Order (Đổi bàn, Gọi thêm món)
         else if ("addMultipleItems".equals(action) || "update".equals(action)) {
+
+            /*
+                UC-03 - Kiểm tra quyền cập nhật order.
+                Chỉ Staff được thêm món hoặc cập nhật hóa đơn.
+            */
+            if (!AuthUtil.checkRole(request, response, "Staff")) {
+                return;
+            }
+
             int orderId = Integer.parseInt(request.getParameter("orderId"));
 
             Model.Order currentOrder = dao.getOrderById(orderId);
@@ -149,6 +196,15 @@ public class HoaDonServlet extends HttpServlet {
         }
         // [UC-06] MAIN FLOW: Xóa món trong Order
         else if ("removeMenuItem".equals(action)) {
+
+            /*
+                UC-03 - Kiểm tra quyền xóa món khỏi order.
+                Chỉ Staff được thay đổi chi tiết order.
+            */
+            if (!AuthUtil.checkRole(request, response, "Staff")) {
+                return;
+            }
+
             int orderId = Integer.parseInt(request.getParameter("orderId"));
             int itemId = Integer.parseInt(request.getParameter("itemId"));
 
@@ -174,6 +230,15 @@ public class HoaDonServlet extends HttpServlet {
         }
 
         else if ("chuyen_thanh_toan".equals(action)) {
+
+            /*
+                UC-03 - Kiểm tra quyền chuyển order sang trạng thái chờ thanh toán.
+                Đây là thao tác của nhân viên phục vụ nên chỉ Staff được thực hiện.
+            */
+            if (!AuthUtil.checkRole(request, response, "Staff")) {
+                return;
+            }
+
             int tableId = Integer.parseInt(request.getParameter("tableId"));
 
             // Tìm cái hóa đơn của bàn này

@@ -4,20 +4,41 @@
 <div class="container-fluid mt-4">
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h2>Quản lý hóa đơn</h2>
+        <%--
+    UC-03 - KIỂM TRA QUYỀN TẠO HÓA ĐƠN
+
+    Main Flow [3.1.3]: Lấy role của người dùng từ Session.
+    Main Flow [3.1.4]: So sánh role với quyền được phép thực hiện chức năng.
+
+    nghiệp vụ:
+    - Staff được phép tạo order.
+    - Manager chỉ xem và theo dõi hóa đơn.
+    - Cashier thực hiện thanh toán, không tạo order.
+
+--%>
         <c:choose>
-            <%-- THÀNH PHẦN 1: Nếu là Admin hoặc Manager -> BLOCK (Khóa nút, không cho bấm) --%>
-            <c:when test="${sessionScope.role == 'Admin' || sessionScope.role == 'Manager'}">
-                <button type="button" class="btn btn-secondary" disabled title="Tài khoản Admin không có quyền tạo đơn">
+
+            <%-- Chỉ Staff được mở form tạo hóa đơn --%>
+            <c:when test="${sessionScope.role == 'Staff'}">
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#taoHoaDonModal">
                     + Tạo hóa đơn mới
                 </button>
             </c:when>
 
-            <%-- THÀNH PHẦN 2: Ngược lại (Staff/Thu ngân...) -> MỞ (Bấm bình thường) --%>
+            <%--
+                Manager và Cashier không được tạo hóa đơn.
+                Nút vẫn hiển thị nhưng bị vô hiệu hóa để người dùng
+                nhận biết chức năng tồn tại nhưng không có quyền.
+            --%>
             <c:otherwise>
-                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#taoHoaDonModal">
+                <button type="button"
+                        class="btn btn-secondary"
+                        disabled
+                        title="Chỉ nhân viên phục vụ được phép tạo hóa đơn">
                     + Tạo hóa đơn mới
                 </button>
             </c:otherwise>
+
         </c:choose>
     </div>
 
@@ -96,84 +117,115 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="btnMoCapNhat" class="btn btn-sm btn-warning" data-toggle="modal" data-target="#capNhatHoaDonModal" data-dismiss="modal">
-                    <i class="fa fa-edit"></i> Cập nhật
+
+                <%--
+                    UC-03 - KIỂM TRA QUYỀN CẬP NHẬT ORDER
+
+                    Chỉ Staff được:
+                    - Gọi thêm món.
+                    - Chuyển bàn.
+                    - Cập nhật thông tin order.
+
+                    Manager và Cashier chỉ xem chi tiết nên không hiển thị nút Cập nhật.
+                --%>
+                <c:if test="${sessionScope.role == 'Staff'}">
+                    <button type="button" id="btnMoCapNhat" class="btn btn-sm btn-warning" data-toggle="modal"
+                            data-target="#capNhatHoaDonModal" data-dismiss="modal">
+                        <i class="fa fa-edit"></i> Cập nhật
+                    </button>
+                </c:if>
+
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                    Đóng
                 </button>
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+
             </div>
         </div>
     </div>
 </div>
+<%--
+    UC-03 - Chỉ Staff được tải form tạo hóa đơn
+    vào giao diện.
 
-<div class="modal fade" id="taoHoaDonModal" tabindex="-1">
-    <div class="modal-dialog">
-        <form action="HoaDon" method="POST">
-            <input type="hidden" name="action" value="create">
+    Đây là lớp bảo vệ giao diện.
+    HoaDonServlet vẫn phải kiểm tra action=create.
+--%>
+<c:if test="${sessionScope.role == 'Staff'}">
+    <div class="modal fade" id="taoHoaDonModal" tabindex="-1">
+        <div class="modal-dialog">
+            <form action="HoaDon" method="POST">
+                <input type="hidden" name="action" value="create">
 
-            <div class="modal-content">
-                <div class="modal-header bg-primary text-white">
-                    <h5 class="modal-title">Tạo hóa đơn mới</h5>
-                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group mb-3">
-                        <label class="fw-bold mb-2">1. Chọn khu vực / Bàn phục vụ:</label>
-                        <select name="tableId" class="form-select form-control">
-                            <option value="0">🛒 Mua mang đi (Takeaway)</option>
-                            <c:forEach items="${listTable}" var="table">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title">Tạo hóa đơn mới</h5>
+                        <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="form-group mb-3">
+                            <label class="fw-bold mb-2">1. Chọn khu vực / Bàn phục vụ:</label>
+                            <select name="tableId" class="form-select form-control">
+                                <option value="0">🛒 Mua mang đi (Takeaway)</option>
+                                <c:forEach items="${listTable}" var="table">
+                                    <c:choose>
+                                        <%-- ĐIỀU KIỆN: Nếu bàn trống thì mới cho chọn --%>
+                                        <c:when test="${table.status == 'Trống'}">
+                                            <option value="${table.tableId}">${table.tableName} (Khu
+                                                vực: ${table.area})
+                                            </option>
+                                        </c:when>
+                                        <%-- NGƯỢC LẠI: Bàn đang phục vụ / chưa thanh toán thì làm mờ (disabled) --%>
+                                        <c:otherwise>
+                                            <option value="${table.tableId}" disabled>
+                                                    ${table.tableName} - Đang bận (${table.status})
+                                            </option>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:forEach>
+
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="fw-bold mb-2">2. Chọn món ăn / thức uống:</label>
+                            <div style="max-height: 250px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; background: #f8f9fa;">
                                 <c:choose>
-                                    <%-- ĐIỀU KIỆN: Nếu bàn trống thì mới cho chọn --%>
-                                    <c:when test="${table.status == 'Trống'}">
-                                        <option value="${table.tableId}">${table.tableName} (Khu vực: ${table.area})</option>
+                                    <c:when test="${not empty listMenu}">
+                                        <c:forEach var="item" items="${listMenu}">
+                                            <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="checkbox" name="itemIds"
+                                                           value="${item.itemId}" id="item_${item.itemId}">
+                                                    <label class="form-check-label ms-2" for="item_${item.itemId}">
+                                                        <strong>${item.itemName}</strong> <br>
+                                                        <small class="text-danger">${item.price} VNĐ</small>
+                                                    </label>
+                                                </div>
+                                                <input type="number" name="qty_${item.itemId}"
+                                                       class="form-control text-center" style="width: 70px;" value="1"
+                                                       min="1">
+                                            </div>
+                                        </c:forEach>
                                     </c:when>
-                                    <%-- NGƯỢC LẠI: Bàn đang phục vụ / chưa thanh toán thì làm mờ (disabled) --%>
                                     <c:otherwise>
-                                        <option value="${table.tableId}" disabled>
-                                                ${table.tableName} - Đang bận (${table.status})
-                                        </option>
+                                        <p class="text-muted">Chưa có món ăn nào trong Menu DB.</p>
                                     </c:otherwise>
                                 </c:choose>
-                            </c:forEach>
-
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="fw-bold mb-2">2. Chọn món ăn / thức uống:</label>
-                        <div style="max-height: 250px; overflow-y: auto; border: 1px solid #dee2e6; padding: 10px; border-radius: 5px; background: #f8f9fa;">
-                            <c:choose>
-                                <c:when test="${not empty listMenu}">
-                                    <c:forEach var="item" items="${listMenu}">
-                                        <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-                                            <div class="form-check">
-                                                <input class="form-check-input" type="checkbox" name="itemIds" value="${item.itemId}" id="item_${item.itemId}">
-                                                <label class="form-check-label ms-2" for="item_${item.itemId}">
-                                                    <strong>${item.itemName}</strong> <br>
-                                                    <small class="text-danger">${item.price} VNĐ</small>
-                                                </label>
-                                            </div>
-                                            <input type="number" name="qty_${item.itemId}" class="form-control text-center" style="width: 70px;" value="1" min="1">
-                                        </div>
-                                    </c:forEach>
-                                </c:when>
-                                <c:otherwise>
-                                    <p class="text-muted">Chưa có món ăn nào trong Menu DB.</p>
-                                </c:otherwise>
-                            </c:choose>
+                            </div>
                         </div>
                     </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-success">Khởi tạo</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Khởi tạo</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
-                </div>
-            </div>
-        </form>
+            </form>
+        </div>
     </div>
-</div>
-
+</c:if>
+<c:if test="${sessionScope.role == 'Staff'}">
 <div class="modal fade" id="capNhatHoaDonModal" tabindex="-1">
     <div class="modal-dialog">
         <form action="HoaDon" method="POST">
@@ -207,13 +259,15 @@
                             <c:forEach var="item" items="${listMenu}">
                                 <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
                                     <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" name="itemIds" value="${item.itemId}" id="upd_item_${item.itemId}">
+                                        <input class="form-check-input" type="checkbox" name="itemIds"
+                                               value="${item.itemId}" id="upd_item_${item.itemId}">
                                         <label class="form-check-label ms-2" for="upd_item_${item.itemId}">
                                             <strong>${item.itemName}</strong> <br>
                                             <small class="text-danger">${item.price} VNĐ</small>
                                         </label>
                                     </div>
-                                    <input type="number" name="qty_${item.itemId}" class="form-control text-center" style="width: 70px;" value="1" min="1">
+                                    <input type="number" name="qty_${item.itemId}" class="form-control text-center"
+                                           style="width: 70px;" value="1" min="1">
                                 </div>
                             </c:forEach>
                         </div>
@@ -228,6 +282,7 @@
         </form>
     </div>
 </div>
+</c:if>
 
 <script>
     // Hàm đẩy Mã hóa đơn vào Popup khi người dùng bấm nút

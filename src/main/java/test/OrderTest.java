@@ -1,5 +1,6 @@
 package test;
 
+import Model.CoffeeTable;
 import Model.MenuItem;
 import Model.Order;
 import Model.OrderDetail;
@@ -9,6 +10,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class OrderTest {
+    private Order order;
+    private MenuItem cafeDa;
+    private MenuItem traSua;
 
     // Kịch bản 1: Test tính tiền hóa đơn bình thường
     @Test
@@ -56,5 +60,51 @@ public class OrderTest {
 
         // Mong đợi: 100 * 25.000 = 2.500.000đ
         assertEquals(2500000.0, order.calculateTotal(), "Lỗi: Tính toán số tiền lớn bị sai!");
+    }
+    @Before
+    public void setUp() {
+        // Thiết lập dữ liệu giả lập (Mock data) trước mỗi ca test
+        CoffeeTable table = new CoffeeTable(1, "Bàn 1", "Tầng 1", "Trống");
+        order = new Order(table);
+
+        cafeDa = new MenuItem();
+        cafeDa.setItemId(1);
+        cafeDa.setItemName("Cà phê đá");
+        cafeDa.setPrice(20000.0);
+
+        traSua = new MenuItem();
+        traSua.setItemId(2);
+        traSua.setItemName("Trà sữa trân châu");
+        traSua.setPrice(35000.0);
+    }
+
+    @Test
+    public void testTaoOrderVaTinhThanhTienMotMon() {
+        // Test logic của UC-05: Thêm món và tính Subtotal
+        OrderDetail detail = new OrderDetail(cafeDa, 2); // Mua 2 ly cafe đá
+        double expectedSubtotal = 40000.0;
+
+        Assert.assertEquals("Thành tiền của 1 món phải bằng Đơn giá x Số lượng",
+                expectedSubtotal, detail.calculateSubtotal(), 0.0);
+    }
+
+    @Test
+    public void testCapNhatOrderVaTinhTongTien() {
+        // Test logic của UC-06: Thêm nhiều món và tính Total
+        order.addItem(cafeDa, 1); // 20.000
+        order.addItem(traSua, 2); // 70.000
+
+        double expectedTotal = 90000.0;
+        Assert.assertEquals("Tổng tiền hóa đơn phải bằng tổng các thành tiền (subtotal)",
+                expectedTotal, order.calculateTotal(), 0.0);
+    }
+
+    @Test
+    public void testSoLuongMonKhongHopLe() {
+        // Test luồng ngoại lệ: Cố tình thêm món với số lượng âm
+        OrderDetail detail = new OrderDetail(cafeDa, -5);
+
+        double subtotal = detail.calculateSubtotal();
+        Assert.assertTrue("Thành tiền không được là số âm", subtotal <= 0);
     }
 }

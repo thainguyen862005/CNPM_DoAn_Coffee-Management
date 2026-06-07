@@ -1,1 +1,13 @@
 /.idea/compiler.xml
+# Thư mục build của Maven
+target/
+
+# Cấu hình của IntelliJ (Rất hay gây lỗi cho máy bạn)
+.idea/
+*.iml
+
+# Các file log rác
+*.log
+
+# Cấu hình Mac (Nếu nhóm có đứa xài Macbook)
+.DS_Store

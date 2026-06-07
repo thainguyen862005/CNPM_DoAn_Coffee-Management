@@ -1,0 +1,99 @@
+
+:root {
+    --topbar-height: 58px;
+    --sidebar-width: 260px;
+}
+
+html,
+body {
+    height: 100%;
+    margin: 0;
+    overflow: hidden; /* Không cho toàn bộ màn hình bị cuộn */
+    background: #f2f4f7;
+}
+
+/* ========= TOP NAVBAR ==================== */
+
+.top-navbar {
+    height: var(--topbar-height);
+    background-color: #007bff;
+    color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.top-navbar h4 {
+    margin: 0;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+/* ========== MAIN LAYOUT ==================== */
+
+.app-body {
+    display: flex;
+    height: calc(100vh - var(--topbar-height));
+    width: 100%;
+    overflow: hidden;
+}
+
+/* ============ SIDEBAR ==================== */
+
+.sidebar {
+    width: var(--sidebar-width);
+    height: 100%;
+    flex-shrink: 0;
+    background-color: #343a40;
+    padding: 0;
+    overflow-y: auto; /* Sidebar tự scroll nếu menu dài */
+    overflow-x: hidden;
+}
+
+.sidebar a {
+    color: #cfd8dc;
+    display: block;
+    padding: 15px;
+    border-bottom: 1px solid #454d55;
+    text-decoration: none;
+}
+
+.sidebar a:hover {
+    background-color: #495057;
+    color: white;
+}
+
+.sidebar i {
+    width: 25px;
+}
+
+.sidebar a.active-tab {
+    background-color: cornflowerblue;
+    color: white;
+    font-weight: bold;
+    border-left: 5px solid #ffc107;
+}
+
+/* ======= MAIN CONTENT ========== */
+
+.main-content {
+    flex: 1;
+    height: 100%;
+    overflow: hidden;
+    padding: 22px 28px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.main-content-inner {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 4px;
+}
+

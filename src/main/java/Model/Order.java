@@ -10,6 +10,7 @@ public class Order {
     private LocalDateTime createdAt;
     private String status;
     private List<OrderDetail> orderDetails = new ArrayList<>(); // Danh sách món đã gọi
+    private String orderType = "DINE_IN";
 
     private static List<Order> danhSachHoaDon = new ArrayList<>();
 
@@ -65,6 +66,13 @@ public class Order {
 
     public void setOrderDetails(List<OrderDetail> orderDetails) {
         this.orderDetails = orderDetails;
+    }
+    public String getOrderType() {
+        return orderType;
+    }
+
+    public void setOrderType(String orderType) {
+        this.orderType = orderType;
     }
 
     public static List<Order> getDanhSachHoaDon() {

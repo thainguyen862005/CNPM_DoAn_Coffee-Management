@@ -10,6 +10,8 @@ public class OrderDetail {
     private double unitPrice;
     private double subtotal;
     private MenuItem menuItem;
+    private String note;
+    private String status = "PENDING";
 
     public OrderDetail() {}
 
@@ -41,6 +43,21 @@ public class OrderDetail {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
         calculateSubtotal();
+    }
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
     public double getUnitPrice() { return unitPrice; }
     public void setUnitPrice(double unitPrice) {

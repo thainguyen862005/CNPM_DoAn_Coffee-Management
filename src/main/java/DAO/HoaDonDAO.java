@@ -289,3 +289,137 @@ public class HoaDonDAO {
         public String getMonBanChay() { return monBanChay; }
     }
 }
+
+    // 1. Hàm lấy ID bàn hiện tại của hóa đơn
+    public int getTableIdByOrderId(int orderId) {
+        String sql = "SELECT table_id FROM orders WHERE order_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) return rs.getInt("table_id");
+        } catch (Exception e) { e.printStackTrace(); }
+        return 0; // Trả về 0 nghĩa là đang ở trạng thái Mang đi
+    }
+
+    // 2. Hàm đổi bàn mới cho hóa đơn
+    public void updateOrderTable(int orderId, int newTableId) {
+        String sql = "UPDATE orders SET table_id = ? WHERE order_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            if (newTableId > 0) ps.setInt(1, newTableId);
+            else ps.setNull(1, java.sql.Types.INTEGER); // Chuyển sang Mua mang đi
+            ps.setInt(2, orderId);
+            ps.executeUpdate();
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    // 3. Hàm gọi thêm món (Nếu món đã có thì cộng dồn số lượng, chưa có thì thêm mới)
+    public void addOrUpdateOrderDetail(int orderId, int itemId, int quantityAdded) {
+        String checkSql = "SELECT quantity FROM order_details WHERE order_id = ? AND item_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement psCheck = conn.prepareStatement(checkSql)) {
+
+            psCheck.setInt(1, orderId);
+            psCheck.setInt(2, itemId);
+            ResultSet rs = psCheck.executeQuery();
+
+            if (rs.next()) {
+                // Đã gọi món này rồi -> Cộng dồn số lượng và tính lại tiền (Subtotal)
+                int newQty = rs.getInt("quantity") + quantityAdded;
+                String updateSql = "UPDATE order_details SET quantity = ?, subtotal = unit_price * ? WHERE order_id = ? AND item_id = ?";
+                try (PreparedStatement psUpdate = conn.prepareStatement(updateSql)) {
+                    psUpdate.setInt(1, newQty);
+                    psUpdate.setInt(2, newQty);
+                    psUpdate.setInt(3, orderId);
+                    psUpdate.setInt(4, itemId);
+                    psUpdate.executeUpdate();
+                }
+            } else {
+                // Món mới hoàn toàn -> Gọi lại hàm thêm mới của bạn
+                addOrderDetail(orderId, itemId, quantityAdded);
+            }
+        } catch (Exception e) { e.printStackTrace(); }
+    }
+
+    //Thanh toán hoá đơn, chuyển trạng thái, lưu hoá đơn
+    public void thanhToanHoaDon(int orderId, int tableId) {
+        String sqlUpdateOrder = "UPDATE orders SET status = 'Đã thanh toán' WHERE order_id = ?";
+        String sqlUpdateTable = "UPDATE coffee_tables SET status = 'Trống' WHERE table_id = ?";
+
+        try (Connection conn = DBUtil.getConnection()) {
+            // UC-20: Lưu trạng thái hóa đơn thành Đã thanh toán
+            try (PreparedStatement ps1 = conn.prepareStatement(sqlUpdateOrder)) {
+                ps1.setInt(1, orderId);
+                ps1.executeUpdate();
+            }
+
+            // UC-19: Cập nhật trạng thái bàn về Trống (chỉ cập nhật nếu hóa đơn có gắn với bàn)
+            if (tableId > 0) {
+                try (PreparedStatement ps2 = conn.prepareStatement(sqlUpdateTable)) {
+                    ps2.setInt(1, tableId);
+                    ps2.executeUpdate();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi khi thanh toán: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Hàm tìm hóa đơn đang mở dựa vào ID Bàn (Dùng cho bên Sơ đồ bàn)
+    public Order getOrderByTableId(int tableId) {
+        String sql = "SELECT order_id FROM orders WHERE table_id = ? AND status != 'Đã thanh toán' ORDER BY order_id DESC LIMIT 1";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, tableId);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                // Tận dụng lại hàm getOrderById đã viết từ trước cho khỏe
+                return getOrderById(rs.getInt("order_id"));
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi tìm order theo bàn: " + e.getMessage());
+        }
+        return null;
+    }
+    public boolean removeOrderDetail(int orderId, int itemId) {
+        String sql = "DELETE FROM order_details WHERE order_id = ? AND item_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ps.setInt(2, itemId);
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            System.out.println("Lỗi khi xóa món khỏi order: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return false;
+    }
+    // Hàm xóa hoàn toàn hóa đơn (Sử dụng khi hóa đơn bị xóa hết món)
+    public void deleteOrder(int orderId) {
+        String sql = "DELETE FROM orders WHERE order_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Lỗi xóa hóa đơn trống: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // Hàm cập nhật nhanh trạng thái hóa đơn (Dùng cho Chuyển thanh toán)
+    public void updateOrderStatus(int orderId, String status) {
+        String sql = "UPDATE orders SET status = ? WHERE order_id = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setInt(2, orderId);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("Lỗi cập nhật trạng thái: " + e.getMessage());
+        }
+    }
+}

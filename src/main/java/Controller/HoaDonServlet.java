@@ -144,7 +144,7 @@ public class HoaDonServlet extends HttpServlet {
                     dao.addOrUpdateOrderDetail(orderId, itemId, quantity);
                 }
             }
-            response.sendRedirect("HoaDon?action=detail&id=" + orderId);
+            response.sendRedirect("HoaDon");
         }
         else if ("removeMenuItem".equals(action)) {
             int orderId = Integer.parseInt(request.getParameter("orderId"));

@@ -127,6 +127,7 @@ public class HoaDonDAO {
         }
         return false;
     }
+
     // 1. Hàm lấy danh sách Menu đồ uống ném lên Form
     public List<Model.MenuItem> getAllMenuItems() {
         List<Model.MenuItem> list = new ArrayList<>();
@@ -134,14 +135,16 @@ public class HoaDonDAO {
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
-            while(rs.next()) {
+            while (rs.next()) {
                 Model.MenuItem item = new Model.MenuItem();
                 item.setItemId(rs.getInt("item_id"));
                 item.setItemName(rs.getString("item_name"));
                 item.setPrice(rs.getDouble("price"));
                 list.add(item);
             }
-        } catch(Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return list;
     }
 
@@ -159,7 +162,9 @@ public class HoaDonDAO {
             ResultSet rs = ps.getGeneratedKeys();
             if (rs.next()) return rs.getInt(1); // Trả về mã ID
 
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return -1;
     }
 
@@ -175,8 +180,11 @@ public class HoaDonDAO {
             ps.setInt(4, quantity);
             ps.setInt(5, itemId);
             ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
+
     // Hàm lấy danh sách tất cả các bàn từ Database để đổ lên Form
     public List<Model.CoffeeTable> getAllTables() {
         List<Model.CoffeeTable> list = new ArrayList<>();
@@ -184,7 +192,7 @@ public class HoaDonDAO {
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
-            while(rs.next()) {
+            while (rs.next()) {
                 Model.CoffeeTable table = new Model.CoffeeTable(
                         rs.getInt("table_id"),
                         rs.getString("table_name"),
@@ -193,7 +201,7 @@ public class HoaDonDAO {
                 );
                 list.add(table);
             }
-        } catch(Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return list;
@@ -240,7 +248,9 @@ public class HoaDonDAO {
             ps.setInt(1, orderId);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) return rs.getInt("table_id");
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return 0; // Trả về 0 nghĩa là đang ở trạng thái Mang đi
     }
 
@@ -253,7 +263,9 @@ public class HoaDonDAO {
             else ps.setNull(1, java.sql.Types.INTEGER); // Chuyển sang Mua mang đi
             ps.setInt(2, orderId);
             ps.executeUpdate();
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     // 3. Hàm gọi thêm món (Nếu món đã có thì cộng dồn số lượng, chưa có thì thêm mới)
@@ -281,7 +293,9 @@ public class HoaDonDAO {
                 // Món mới hoàn toàn -> Gọi lại hàm thêm mới của bạn
                 addOrderDetail(orderId, itemId, quantityAdded);
             }
-        } catch (Exception e) { e.printStackTrace(); }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     //Thanh toán hoá đơn, chuyển trạng thái, lưu hoá đơn
@@ -325,6 +339,7 @@ public class HoaDonDAO {
         }
         return null;
     }
+
     public boolean removeOrderDetail(int orderId, int itemId) {
         String sql = "DELETE FROM order_details WHERE order_id = ? AND item_id = ?";
         try (Connection conn = DBUtil.getConnection();
@@ -339,6 +354,7 @@ public class HoaDonDAO {
         }
         return false;
     }
+
     // Hàm xóa hoàn toàn hóa đơn (Sử dụng khi hóa đơn bị xóa hết món)
     public void deleteOrder(int orderId) {
         String sql = "DELETE FROM orders WHERE order_id = ?";
@@ -363,5 +379,67 @@ public class HoaDonDAO {
         } catch (Exception e) {
             System.out.println("Lỗi cập nhật trạng thái: " + e.getMessage());
         }
+    }
+
+    // --- BỔ SUNG BỘ LỌC THỜI GIAN CHO TRANG BÁO CÁO ---
+
+    // 1. Hàm lấy tổng số hóa đơn theo bộ lọc thời gian
+    public int getTotalInvoices(String timeFilter) {
+        int total = 0;
+        String sql = "SELECT COUNT(*) FROM orders o WHERE o.status = 'Đã thanh toán'";
+
+        // Cộng dồn điều kiện SQL tùy theo bộ lọc chọn từ Combobox
+        if ("today".equals(timeFilter)) {
+            sql += " AND o.created_at >= CURDATE()"; // Từ 00:00 hôm nay
+        } else if ("week".equals(timeFilter)) {
+            sql += " AND o.created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)"; // 7 ngày qua
+        } else if ("month".equals(timeFilter)) {
+            sql += " AND o.created_at >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)"; // 1 tháng qua
+        } else if ("year".equals(timeFilter)) {
+            sql += " AND o.created_at >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)"; // 1 năm qua
+        }
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                total = rs.getInt(1);
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi tính tổng số hóa đơn: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return total;
+    }
+
+    // 2. Hàm tính tổng doanh thu theo bộ lọc thời gian
+    public double getTotalRevenue(String timeFilter) {
+        double total = 0;
+        String sql = "SELECT SUM(od.quantity * od.unit_price) FROM order_details od " +
+                "JOIN orders o ON od.order_id = o.order_id " +
+                "WHERE o.status = 'Đã thanh toán'";
+
+        // Cộng dồn điều kiện SQL tương tự
+        if ("today".equals(timeFilter)) {
+            sql += " AND o.created_at >= CURDATE()";
+        } else if ("week".equals(timeFilter)) {
+            sql += " AND o.created_at >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)";
+        } else if ("month".equals(timeFilter)) {
+            sql += " AND o.created_at >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)";
+        } else if ("year".equals(timeFilter)) {
+            sql += " AND o.created_at >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)";
+        }
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                total = rs.getDouble(1);
+            }
+        } catch (Exception e) {
+            System.out.println("Lỗi tính tổng doanh thu: " + e.getMessage());
+            e.printStackTrace();
+        }
+        return total;
     }
 }

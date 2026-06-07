@@ -16,12 +16,20 @@
                         <%-- TRẠNG THÁI 1: TRỐNG (MÀU XANH) --%>
                         <c:when test="${ban.status eq 'Trống'}">
                             <span class="badge badge-success"><i class="fa fa-check"></i> Trống</span>
-                            <a href="HoaDon?action=new&tableId=${ban.tableId}" class="btn btn-outline-primary btn-sm mt-2 btn-block">Gọi Món</a>
+                            <%--
+                                UC-03: Chỉ Staff được tạo order cho bàn.
+                            --%>
+                            <c:if test="${sessionScope.role == 'Staff'}">
+                                <a href="HoaDon?action=new&tableId=${ban.tableId}" class="btn btn-outline-primary btn-sm mt-2 btn-block">
+                                    Gọi Món
+                                </a>
+                            </c:if>
                         </c:when>
 
                         <%-- TRẠNG THÁI 2: ĐANG PHỤC VỤ (MÀU ĐỎ) --%>
                         <c:when test="${ban.status eq 'Đang phục vụ'}">
                             <span class="badge badge-danger"><i class="fa fa-fire"></i> Đang phục vụ</span>
+                            <c:if test="${sessionScope.role == 'Staff'}">
                             <form action="HoaDon" method="POST" class="m-0 mt-2">
                                 <input type="hidden" name="action" value="chuyen_thanh_toan">
                                 <input type="hidden" name="tableId" value="${ban.tableId}">
@@ -29,14 +37,17 @@
                                     <i class="fa fa-share"></i> Chuyển thanh toán
                                 </button>
                             </form>
+                            </c:if>
                         </c:when>
 
                         <%-- TRẠNG THÁI 3: CHƯA THANH TOÁN (MÀU VÀNG) --%>
                         <c:otherwise>
                             <span class="badge badge-warning text-dark"><i class="fa fa-clock-o"></i> Chưa thanh toán</span>
+                            <c:if test="${sessionScope.role == 'Cashier'}">
                             <button type="button" class="btn btn-warning btn-sm mt-2 btn-block text-dark font-weight-bold" onclick="moPopupThanhToan(${ban.tableId})">
                                 <i class="fa fa-calculator"></i> Thanh toán
                             </button>
+                            </c:if>
                         </c:otherwise>
                     </c:choose>
                 </div>

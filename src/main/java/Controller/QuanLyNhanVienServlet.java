@@ -3,6 +3,7 @@ package Controller;
 import DAO.UserDAO;
 import Model.User;
 
+import Util.AuthUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -37,37 +38,40 @@ public class QuanLyNhanVienServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
 
-        if (!checkLogin(request, response)) {
-            return;
-        }
+    /*
+        UC-03 - Kiểm tra quyền truy cập
+        [3.1.2]: Servlet kiểm tra Session hiện tại.
+        [3.1.3]: Lấy role từ Session.
+        [3.1.4]: So sánh role với quyền Manager.
+        [3.1.5]: Nếu hợp lệ, cho phép request tiếp tục xử lý.
 
-        if (!checkManagerPermission(request, response)) {
+        UC-04 - Quản lý nhân viên
+        [4.1.2]: QuanLyNhanVienServlet kiểm tra Session và quyền truy cập.
+        [4.6.0 - 4.6.3]: Nếu không có quyền Manager, hiển thị access_denied.jsp.
+    */
+        if (!AuthUtil.checkManager(request, response)) {
             return;
         }
 
         loadEmployeeList(request, response);
     }
-
-    /*
-        UC-04 - Quản lý nhân viên
-        Alternative Flow [4.2.3]: Giao diện gửi dữ liệu đến QuanLyNhanVienServlet với action add.
-        Alternative Flow [4.3.3]: Giao diện gửi dữ liệu đến QuanLyNhanVienServlet với action update.
-        Alternative Flow [4.4.3]: Giao diện gửi yêu cầu đến QuanLyNhanVienServlet với action delete.
-    */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         request.setCharacterEncoding("UTF-8");
         response.setCharacterEncoding("UTF-8");
 
-        if (!checkLogin(request, response)) {
-            return;
-        }
-
-        if (!checkManagerPermission(request, response)) {
+    /*
+        UC-03 - Kiểm tra quyền truy cập
+        Áp dụng cho các thao tác thêm, sửa, xóa nhân viên.
+        Chỉ tài khoản có role Manager mới được xử lý tiếp.
+    */
+        if (!AuthUtil.checkManager(request, response)) {
             return;
         }
 
@@ -85,60 +89,47 @@ public class QuanLyNhanVienServlet extends HttpServlet {
     }
 
     /*
-        UC-03 - Kiểm tra quyền truy cập
-        Alternative Flow [3.2.0 - 3.2.3]:
-        Nếu Session không tồn tại, hệ thống điều hướng người dùng về login.jsp.
-    */
-    private boolean checkLogin(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
-        HttpSession session = request.getSession(false);
+    UC-04 - Quản lý nhân viên
 
-        if (session == null || session.getAttribute("userDaDangNhap") == null) {
-            response.sendRedirect("login.jsp");
-            return false;
-        }
+    Main Flow [4.1.3]: Servlet gọi UserDAO để lấy danh sách nhân viên.
+    Main Flow [4.1.6]: Servlet gửi danh sách nhân viên sang trang quan_ly_nhan_vien.jsp.
+    Main Flow [4.1.7]: Giao diện hiển thị danh sách nhân viên cho Quản lý.
 
-        return true;
-    }
-
-    /*
-        UC-03 - Kiểm tra quyền truy cập
-        Main Flow [3.1.3]: Hệ thống lấy thông tin role của người dùng từ Session.
-        Main Flow [3.1.4]: Servlet so sánh role với quyền được phép truy cập chức năng.
-        Alternative Flow [3.3.0 - 3.3.3]:
-        Nếu role không đủ quyền, hệ thống hiển thị access_denied.jsp.
-
-        UC-04 - Alternative Flow [4.6.0 - 4.6.3]:
-        Nếu người dùng không có quyền Manager, hệ thống từ chối truy cập chức năng quản lý nhân viên.
-    */
-    private boolean checkManagerPermission(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        HttpSession session = request.getSession(false);
-        String role = (String) session.getAttribute("role");
-
-        if (!"Manager".equals(role)) {
-            request.getRequestDispatcher("access_denied.jsp").forward(request, response);
-            return false;
-        }
-
-        return true;
-    }
-
-    /*
-        UC-04 - Quản lý nhân viên
-        Main Flow [4.1.3]: Servlet gọi UserDAO.getAllUsers().
-        Main Flow [4.1.6]: Servlet gửi danh sách nhân viên sang trang quan_ly_nhan_vien.jsp.
-        Main Flow [4.1.7]: Giao diện hiển thị danh sách nhân viên cho Quản lý.
-    */
+    Alternative Flow [4.7.0 - 4.7.5]: Xử lý tìm kiếm nhân viên theo username.
+    Alternative Flow [4.8.0 - 4.8.5]: Xử lý lọc nhân viên theo role.
+    Alternative Flow [4.9.0 - 4.9.3]: Nếu không có kết quả, Servlet gửi danh sách rỗng để JSP hiển thị thông báo.
+*/
     private void loadEmployeeList(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        List<User> users = userDAO.getAllUsers();
 
+    /*
+        UC-04 - Alternative Flow [4.7.1] và [4.8.1]: Nhận keyword và role từ form tìm kiếm/lọc trên quan_ly_nhan_vien.jsp.
+    */
+        String keyword = request.getParameter("keyword");
+        String role = request.getParameter("role");
+
+    /*
+        UC-04 - Main Flow [4.1.3] kết hợp Alternative Flow [4.7.2] và [4.8.2]:
+        - Gọi UserDAO.searchAndFilterUsers(keyword, role).
+        - Nếu keyword/role rỗng, DAO sẽ trả về toàn bộ danh sách nhân viên.
+    */
+        List<User> users = userDAO.searchAndFilterUsers(keyword, role);
+
+    /*
+        UC-04 - Main Flow [4.1.6]: Gửi danh sách nhân viên sang quan_ly_nhan_vien.jsp.
+    */
         request.setAttribute("danhSachNhanVien", users);
+
+    /*
+        Giữ lại điều kiện tìm kiếm/lọc để JSP hiển thị lại trên form sau khi submit.
+    */
+        request.setAttribute("keyword", keyword == null ? "" : keyword.trim());
+        request.setAttribute("selectedRole", role == null ? "" : role.trim());
+
         request.setAttribute("page_content", "quan_ly_nhan_vien.jsp");
         request.setAttribute("active_tab", "nhanvien");
 
-        request.getRequestDispatcher("main_ui.jsp").forward(request, response);
+        request.getRequestDispatcher("/WEB-INF/views/main_ui.jsp").forward(request, response);
     }
 
     /*

@@ -68,6 +68,73 @@
         </div>
     </div>
 
+    <%-- ======== SEARCH & FILTER NV ============== --%>
+    <div class="card-custom employee-filter-card">
+        <div class="card-header-custom">
+            <i class="fa fa-search"></i> Tìm kiếm và lọc nhân viên
+        </div>
+
+        <div class="card-body-custom">
+
+            <%--
+                UC-04 - Quản lý nhân viên
+
+                Alternative Flow [4.7.0]: Quản lý nhập từ khóa tìm kiếm theo tên đăng nhập.
+                Alternative Flow [4.7.1]: Giao diện quan_ly_nhan_vien.jsp gửi keyword đến QuanLyNhanVienServlet bằng phương thức GET.
+                Alternative Flow [4.8.0]: Quản lý chọn vai trò cần lọc.
+                Alternative Flow [4.8.1]: Giao diện quan_ly_nhan_vien.jsp gửi role đến QuanLyNhanVienServlet bằng phương thức GET.
+
+            --%>
+
+            <form action="QuanLyNhanVien" method="get">
+                <div class="form-row">
+
+                    <div class="form-group col-md-6">
+                        <label>Tìm theo tên đăng nhập</label>
+                        <input type="text"
+                               class="form-control"
+                               name="keyword"
+                               value="${keyword}"
+                               placeholder="Nhập username cần tìm">
+                    </div>
+
+                    <div class="form-group col-md-4">
+                        <label>Lọc theo vai trò</label>
+                        <select class="form-control" name="role">
+                            <option value="" ${empty selectedRole ? 'selected' : ''}>
+                                -- Tất cả vai trò --
+                            </option>
+
+                            <option value="Manager" ${selectedRole == 'Manager' ? 'selected' : ''}>
+                                Quản lý
+                            </option>
+
+                            <option value="Staff" ${selectedRole == 'Staff' ? 'selected' : ''}>
+                                Nhân viên phục vụ
+                            </option>
+
+                            <option value="Cashier" ${selectedRole == 'Cashier' ? 'selected' : ''}>
+                                Thu ngân
+                            </option>
+                        </select>
+                    </div>
+
+                    <div class="form-group col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-blue btn-block mr-1" title="Tìm kiếm">
+                            <i class="fa fa-search"></i>
+                        </button>
+
+                        <a href="QuanLyNhanVien" class="btn btn-secondary btn-block ml-1" title="Làm mới">
+                            <i class="fa fa-refresh"></i>
+                        </a>
+                    </div>
+
+                </div>
+            </form>
+
+        </div>
+    </div>
+
     <%-- =========== LIST NV ==================== --%>
     <div class="card-custom employee-list-card">
         <div class="card-header-custom">
@@ -98,10 +165,16 @@
 
                     <tbody>
                     <c:choose>
+
+                        <%--
+                            UC-04 - Quản lý nhân viên
+                            Alternative Flow [4.9.2]: Servlet gửi danh sách rỗng sang quan_ly_nhan_vien.jsp.
+                            Alternative Flow [4.9.3]: Giao diện hiển thị thông báo không tìm thấy nhân viên phù hợp.
+                        --%>
                         <c:when test="${empty danhSachNhanVien}">
                             <tr>
                                 <td colspan="4" class="text-center text-muted">
-                                    Chưa có dữ liệu nhân viên.
+                                    Không tìm thấy nhân viên phù hợp.
                                 </td>
                             </tr>
                         </c:when>
@@ -149,13 +222,13 @@
                                             <i class="fa fa-pencil"></i> Sửa
                                         </button>
 
-                                                    <%--
-                                                        UC-04 - Quản lý nhân viên
-                                                        Alternative Flow [4.4.0]: Quản lý chọn nhân viên cần xóa.
-                                                        Alternative Flow [4.4.1]: Hệ thống yêu cầu Quản lý xác nhận thao tác xóa.
-                                                        Alternative Flow [4.4.2]: Quản lý xác nhận xóa nhân viên.
-                                                        Alternative Flow [4.4.3]: Giao diện gửi yêu cầu đến QuanLyNhanVienServlet với action delete.
-                                                    --%>
+                                            <%--
+                                                UC-04 - Quản lý nhân viên
+                                                Alternative Flow [4.4.0]: Quản lý chọn nhân viên cần xóa.
+                                                Alternative Flow [4.4.1]: Hệ thống yêu cầu Quản lý xác nhận thao tác xóa.
+                                                Alternative Flow [4.4.2]: Quản lý xác nhận xóa nhân viên.
+                                                Alternative Flow [4.4.3]: Giao diện gửi yêu cầu đến QuanLyNhanVienServlet với action delete.
+                                            --%>
                                         <form action="QuanLyNhanVien"
                                               method="post"
                                               style="display:inline-block;"

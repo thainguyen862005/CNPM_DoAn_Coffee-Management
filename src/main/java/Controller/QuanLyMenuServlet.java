@@ -30,7 +30,7 @@ public class QuanLyMenuServlet extends HttpServlet {
             // 2. Tạo đối tượng và gọi DAO để lưu vào CSDL
             MenuItem monMoi = new MenuItem(maMon,tenMon, giaTien, moTa, trangThai);
             MenuItemDAO dao = new MenuItemDAO();
-            dao.themMonAn(monMoi); // Bạn cần đảm bảo có hàm INSERT INTO trong DAO
+            dao.AddMenuItem(monMoi); // Bạn cần đảm bảo có hàm INSERT INTO trong DAO
 
             // 3. Xong việc thì load lại trang để bảng tự động hiện món mới
             response.sendRedirect("QuanLyMenu");

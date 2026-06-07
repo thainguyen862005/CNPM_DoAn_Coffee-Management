@@ -28,31 +28,54 @@ public class AuthUtil {
     }
 
     /*
-        UC-03 - Main Flow [3.1.3 - 3.1.5]:
-        - Lấy role từ Session.
-        - So sánh role với quyền yêu cầu.
+    UC-03 - Kiểm tra quyền truy cập
 
-        UC-03 - Alternative Flow [3.3.0 - 3.3.3] -> Nếu role không đủ quyền:
-        - Forward sang access_denied.jsp.
-        - Không cho xử lý tiếp request.
-    */
-    public static boolean checkRole(HttpServletRequest request, HttpServletResponse response, String requiredRole)
+    Main Flow:
+    [3.1.2]: Kiểm tra Session.
+    [3.1.3]: Lấy role từ Session.
+    [3.1.4]: So sánh role với quyền yêu cầu.
+    [3.1.5]: Cho phép request tiếp tục nếu hợp lệ.
+
+    Alternative Flow:
+    [3.2.0 - 3.2.3]: Chưa đăng nhập -> chuyển về login.jsp.
+    [3.3.0 - 3.3.3]: Không đủ quyền -> hiển thị access_denied.jsp.
+*/
+    public static boolean checkRole(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    String requiredRole)
             throws ServletException, IOException {
 
         HttpSession session = request.getSession(false);
 
-        if (session == null || session.getAttribute("userDaDangNhap") == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+        // UC-03 [3.2.0 - 3.2.3]: Session không tồn tại hoặc thiếu thông tin.
+        if (session == null
+                || session.getAttribute("userDaDangNhap") == null
+                || session.getAttribute("role") == null) {
+
+            response.sendRedirect(
+                    request.getContextPath() + "/login.jsp"
+            );
             return false;
         }
 
-        String currentRole = (String) session.getAttribute("role");
+        String currentRole =
+                String.valueOf(session.getAttribute("role"));
 
-        if (!requiredRole.equals(currentRole)) {
-            request.getRequestDispatcher("/WEB-INF/views/access_denied.jsp").forward(request, response);
+        // UC-03 [3.3.0 - 3.3.3]: Role không đủ quyền.
+        if (requiredRole == null
+                || !requiredRole.equalsIgnoreCase(currentRole)) {
+
+            request.setAttribute("requiredRole", requiredRole);
+            request.setAttribute("currentRole", currentRole);
+
+            request.getRequestDispatcher(
+                    "/WEB-INF/views/access_denied.jsp"
+            ).forward(request, response);
+
             return false;
         }
 
+        // UC-03 [3.1.5]: Role hợp lệ.
         return true;
     }
 

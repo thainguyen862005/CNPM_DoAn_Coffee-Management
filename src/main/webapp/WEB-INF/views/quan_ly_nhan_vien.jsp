@@ -10,6 +10,51 @@
         <i class="fa fa-users"></i> Quản lý nhân viên
     </div>
 
+    <%--
+    UC-04 - Alternative Flow [4.5.3]:
+    Hiển thị lỗi khi dữ liệu không hợp lệ, username trùng
+    hoặc thao tác cơ sở dữ liệu thất bại.
+--%>
+    <c:if test="${not empty errorMessage}">
+        <div class="alert alert-danger alert-dismissible fade show">
+            <i class="fa fa-exclamation-circle"></i>
+                ${errorMessage}
+
+            <button type="button"
+                    class="close"
+                    data-dismiss="alert">
+                <span>&times;</span>
+            </button>
+        </div>
+    </c:if>
+
+    <%--
+        UC-04 [4.2.7], [4.3.7], [4.4.6]:
+        Hiển thị kết quả sau khi thực hiện thành công.
+    --%>
+    <c:choose>
+        <c:when test="${param.success == 'add'}">
+            <div class="alert alert-success">
+                <i class="fa fa-check-circle"></i>
+                Thêm nhân viên thành công.
+            </div>
+        </c:when>
+
+        <c:when test="${param.success == 'update'}">
+            <div class="alert alert-success">
+                <i class="fa fa-check-circle"></i>
+                Cập nhật nhân viên thành công.
+            </div>
+        </c:when>
+
+        <c:when test="${param.success == 'delete'}">
+            <div class="alert alert-success">
+                <i class="fa fa-check-circle"></i>
+                Xóa nhân viên thành công.
+            </div>
+        </c:when>
+    </c:choose>
+
     <%-- ========== FORM ADD NV ============== --%>
     <div class="card-custom ">
         <div class="card-header-custom">
@@ -25,7 +70,7 @@
                 Alternative Flow [4.2.3]: Giao diện gửi dữ liệu đến QuanLyNhanVienServlet với action add.
             --%>
 
-            <form action="QuanLyNhanVien" method="post">
+            <form action="${pageContext.request.contextPath}/QuanLyNhanVien" method="post">
                 <input type="hidden" name="action" value="add">
 
                 <div class="form-row">
@@ -86,7 +131,7 @@
 
             --%>
 
-            <form action="QuanLyNhanVien" method="get">
+            <form action="${pageContext.request.contextPath}/QuanLyNhanVien" method="get">
                 <div class="form-row">
 
                     <div class="form-group col-md-6">
@@ -124,7 +169,7 @@
                             <i class="fa fa-search"></i>
                         </button>
 
-                        <a href="QuanLyNhanVien" class="btn btn-secondary btn-block ml-1" title="Làm mới">
+                        <a href="${pageContext.request.contextPath}/QuanLyNhanVien" class="btn btn-secondary btn-block ml-1" title="Làm mới">
                             <i class="fa fa-refresh"></i>
                         </a>
                     </div>
@@ -229,18 +274,31 @@
                                                 Alternative Flow [4.4.2]: Quản lý xác nhận xóa nhân viên.
                                                 Alternative Flow [4.4.3]: Giao diện gửi yêu cầu đến QuanLyNhanVienServlet với action delete.
                                             --%>
-                                        <form action="QuanLyNhanVien"
-                                              method="post"
-                                              style="display:inline-block;"
-                                              onsubmit="return confirm('Bạn có chắc muốn xóa nhân viên này không?');">
+                                                <c:choose>
+                                                    <c:when test="${sessionScope.userId == nv.userId}">
+                                                        <button type="button"
+                                                                class="btn btn-secondary btn-sm"
+                                                                disabled
+                                                                title="Không thể xóa tài khoản đang đăng nhập">
+                                                            <i class="fa fa-lock"></i> Đang sử dụng
+                                                        </button>
+                                                    </c:when>
 
-                                            <input type="hidden" name="action" value="delete">
-                                            <input type="hidden" name="userId" value="${nv.userId}">
+                                                    <c:otherwise>
+                                                        <form action="${pageContext.request.contextPath}/QuanLyNhanVien"
+                                                              method="post"
+                                                              style="display:inline-block;"
+                                                              onsubmit="return confirm('Bạn có chắc muốn xóa nhân viên này không?');">
 
-                                            <button type="submit" class="btn btn-red btn-sm">
-                                                <i class="fa fa-trash"></i> Xóa
-                                            </button>
-                                        </form>
+                                                            <input type="hidden" name="action" value="delete">
+                                                            <input type="hidden" name="userId" value="${nv.userId}">
+
+                                                            <button type="submit" class="btn btn-red btn-sm">
+                                                                <i class="fa fa-trash"></i> Xóa
+                                                            </button>
+                                                        </form>
+                                                    </c:otherwise>
+                                                </c:choose>
                                     </td>
                                 </tr>
 
@@ -259,7 +317,7 @@
                                                 </button>
                                             </div>
 
-                                            <form action="QuanLyNhanVien" method="post">
+                                            <form action="${pageContext.request.contextPath}/QuanLyNhanVien" method="post">
                                                 <div class="modal-body">
 
                                                         <%--

@@ -51,8 +51,7 @@ public class UserDAO {
     */
     public List<User> getAllUsers() {
         List<User> list = new ArrayList<>();
-        String sql = "SELECT user_id, username, password, role FROM users ORDER BY user_id ASC";
-
+        String sql = "SELECT user_id, username, role FROM users ORDER BY user_id ASC";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -85,9 +84,7 @@ public class UserDAO {
     public List<User> searchAndFilterUsers(String keyword, String role) {
         List<User> list = new ArrayList<>();
 
-        StringBuilder sql = new StringBuilder(
-                "SELECT user_id, username, password, role FROM users WHERE 1=1"
-        );
+        StringBuilder sql = new StringBuilder("SELECT user_id, username, role FROM users WHERE 1=1");
 
         boolean hasKeyword = keyword != null && !keyword.trim().isEmpty();
         boolean hasRole = role != null && !role.trim().isEmpty();
@@ -151,6 +148,35 @@ public class UserDAO {
         }
 
         return false;
+    }
+
+    /*
+    UC-04 - Quản lý nhân viên
+    Alternative Flow [4.5.1]: Khi cập nhật, hệ thống kiểm tra username có thuộc về tài khoản khác hay không.
+
+    Điều kiện:
+    - Username giống chính tài khoản đang sửa: hợp lệ.
+    - Username đã thuộc user_id khác: không hợp lệ.
+*/
+    public boolean isUsernameExistsForOtherUser(String username, int currentUserId) {
+        String sql =
+                "SELECT user_id  FROM users  WHERE BINARY username = ? AND user_id <> ?";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, username);
+            ps.setInt(2, currentUserId);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+
+        } catch (Exception e) {
+            System.err.println("Lỗi UC-04 khi kiểm tra username cập nhật: "+ e.getMessage());
+            e.printStackTrace();
+            return false;
+        }
     }
 
     /*
@@ -236,12 +262,20 @@ public class UserDAO {
         return false;
     }
 
+
     private User mapResultSetToUser(ResultSet rs) throws Exception {
         User user = new User();
+
         user.setUserId(rs.getInt("user_id"));
         user.setUsername(rs.getString("username"));
-        user.setPassword(rs.getString("password"));
         user.setRole(rs.getString("role"));
+
+        try {
+            user.setPassword(rs.getString("password"));
+        } catch (java.sql.SQLException ignored) {
+            user.setPassword(null);
+        }
+
         return user;
     }
 }

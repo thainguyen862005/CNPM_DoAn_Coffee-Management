@@ -10,22 +10,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="2b3d2977-2fd8-4881-a05a-488a618a8e42" name="Changes" comment="Tạo trang đăng nhập và trang chính của hệ thống">
-      <change afterPath="$PROJECT_DIR$/src/main/java/Controller/BaoCaoServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/Controller/HoaDonServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/Controller/QuanLyMenuServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/Controller/QuanLyNhanVienServlet.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/bao_cao.jsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/hoa_don.jsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/quan_ly_menu.jsp" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/webapp/quan_ly_nhan_vien.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Controller/LoginServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Controller/LoginServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/Controller/TrangChuServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Controller/TrangChuServlet.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/webapp/login.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/login.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Controller/BaoCaoServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Controller/BaoCaoServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/Controller/QuanLyMenuServlet.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/Controller/QuanLyMenuServlet.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/DAO/HoaDonDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/DAO/HoaDonDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/DAO/MenuItemDAO.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/DAO/MenuItemDAO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/bao_cao.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/bao_cao.jsp" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/webapp/main_ui.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/main_ui.jsp" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/QuanLyCafe-1.0-SNAPSHOT/WEB-INF/classes/Controller/TrangChuServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/QuanLyCafe-1.0-SNAPSHOT/WEB-INF/classes/Controller/TrangChuServlet.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/QuanLyCafe-1.0-SNAPSHOT/main_ui.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/target/QuanLyCafe-1.0-SNAPSHOT/main_ui.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/webapp/quan_ly_menu.jsp" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/webapp/quan_ly_menu.jsp" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Controller/BaoCaoServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Controller/BaoCaoServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Controller/HoaDonServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Controller/HoaDonServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Controller/LoginServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Controller/LoginServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Controller/QuanLyMenuServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Controller/QuanLyMenuServlet.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/Controller/TrangChuServlet.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Controller/TrangChuServlet.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Model/Category.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Model/Category.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Model/CoffeeTable.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Model/CoffeeTable.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Model/MenuItem.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Model/MenuItem.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Model/Order.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Model/Order.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/Model/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/Model/User.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,7 +45,7 @@
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">
       <map>
-        <entry key="$PROJECT_DIR$" value="23130245_NguyenHoangPhuc" />
+        <entry key="$PROJECT_DIR$" value="main" />
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -57,7 +59,7 @@
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
     &quot;url&quot;: &quot;https://github.com/thainguyen862005/CNPM_DoAn_Coffee-Management.git&quot;,
-    &quot;accountId&quot;: &quot;7cc78826-cb47-4503-816a-e6d9af95c7a6&quot;
+    &quot;accountId&quot;: &quot;a650662a-ded1-4acb-aba7-cfddb802996d&quot;
   },
   &quot;recentNewPullRequestHead&quot;: {
     &quot;server&quot;: {
@@ -89,20 +91,29 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.MainUI.executor": "Run",
+    "Downloaded.Files.Path.Enabled": "false",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "Repository.Attach.Annotations": "false",
+    "Repository.Attach.JavaDocs": "false",
+    "Repository.Attach.Sources": "false",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "Smart Tomcat.Unnamed.executor": "Run",
     "Tomcat Server.Tomcat 10.1.55.executor": "Run",
     "Tomcat Server.Tomcat 10.executor": "Run",
     "codeWithMe.voiceChat.enabledByDefault": "false",
-    "git-widget-placeholder": "23130245__NguyenHoangPhuc",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "23130290__DangThanhTan",
     "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
+    "project.structure.last.edited": "Modules",
     "project.structure.proportion": "0.15",
     "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "com.poratu.idea.plugins.tomcat.setting.TomcatServersConfigurable",
+    "to.speed.mode.migration.done": "true",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -111,109 +122,37 @@
       <recent name="D:\CNPM\CNPM_DoAn_Coffee-Management" />
     </key>
   </component>
-  <component name="RunDashboard">
-    <option name="configurationStatuses">
-      <map>
-        <entry key="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory">
-          <value>
-            <map>
-              <entry key="Tomcat 10" value="STOPPED" />
-            </map>
-          </value>
-        </entry>
-      </map>
-    </option>
-  </component>
   <component name="RunManager">
-    <configuration name="Tomcat 10" type="#com.intellij.j2ee.web.tomcat.TomcatRunConfigurationFactory" factoryName="Local" APPLICATION_SERVER_NAME="Tomcat 10" ALTERNATIVE_JRE_ENABLED="false" nameIsGenerated="true">
-      <option name="OPEN_IN_BROWSER_URL" value="http://localhost:8080/QuanLyCafe_war_exploded/login.jsp" />
-      <option name="BROWSER_ID" value="98ca6316-2f89-46d9-a9e5-fa9e2b0625b3" />
-      <option name="UPDATING_POLICY" value="restart-server" />
-      <deployment>
-        <artifact name="QuanLyCafe:war exploded">
-          <settings>
-            <option name="CONTEXT_PATH" value="/QuanLyCafe_war_exploded" />
-          </settings>
-        </artifact>
-      </deployment>
-      <server-settings>
-        <option name="BASE_DIRECTORY_NAME" value="9bb58ba6-20bf-42b2-a2fa-dfa5585d51a4" />
-      </server-settings>
-      <predefined_log_file enabled="true" id="Tomcat" />
-      <predefined_log_file enabled="true" id="Tomcat Catalina" />
-      <predefined_log_file id="Tomcat Manager" />
-      <predefined_log_file id="Tomcat Host Manager" />
-      <predefined_log_file id="Tomcat Localhost Access" />
-      <RunnerSettings RunnerId="Debug">
-        <option name="DEBUG_PORT" value="60044" />
-      </RunnerSettings>
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Cover">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </SHUTDOWN>
-      </ConfigurationWrapper>
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Debug">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </SHUTDOWN>
-      </ConfigurationWrapper>
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Profile">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </SHUTDOWN>
-      </ConfigurationWrapper>
-      <ConfigurationWrapper VM_VAR="JAVA_OPTS" RunnerId="Run">
-        <option name="USE_ENV_VARIABLES" value="true" />
-        <STARTUP>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </STARTUP>
-        <SHUTDOWN>
-          <option name="USE_DEFAULT" value="true" />
-          <option name="SCRIPT" value="" />
-          <option name="VM_PARAMETERS" value="" />
-          <option name="PROGRAM_PARAMETERS" value="" />
-        </SHUTDOWN>
-      </ConfigurationWrapper>
+    <configuration name="Unnamed" type="com.poratu.idea.plugins.tomcat" nameIsGenerated="true">
+      <predefined_log_file enabled="true" id="Tomcat Localhost Log" />
+      <predefined_log_file enabled="true" id="Tomcat Access Log" />
+      <predefined_log_file id="Tomcat Catalina Log" />
+      <predefined_log_file id="Tomcat Manager Log" />
+      <predefined_log_file id="Tomcat Host Manager Log" />
+      <option name="catalinaBase" value="C:\Users\THANH TAN\.SmartTomcat\NMCNPM\QuanLyCafe" />
+      <option name="contextPath" value="/QuanLyCafe" />
+      <option name="docBase" value="$PROJECT_DIR$/src/main/webapp" />
+      <option name="extraClassPath" value="" />
+      <option name="tomcatInfo">
+        <TomcatInfo>
+          <option name="name" value="Apache Tomcat/10.1.55" />
+          <option name="path" value="$USER_HOME$/tomcat/apache-tomcat-10.1.55" />
+          <option name="version" value="10.1.55.0" />
+        </TomcatInfo>
+      </option>
+      <option name="vmOptions" value="" />
+      <module name="QuanLyCafe" />
       <method v="2">
         <option name="Make" enabled="true" />
-        <option name="BuildArtifacts" enabled="true">
-          <artifact name="QuanLyCafe:war exploded" />
-        </option>
       </method>
     </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-30f59d01ecdd-cffe25b9f5b3-intellij.indexing.shared.core-IU-253.28294.334" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">

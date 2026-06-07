@@ -51,9 +51,14 @@
                 <a href="QuanLyNhanVien" class="${active_tab == 'nhanvien' ? 'active-tab' : ''}">
                     <i class="fa fa-users"></i> Quản Lý Nhân Viên
                 </a>
-                <a href="BaoCao" class="${active_tab == 'baocao' ? 'active-tab' : ''}">
-                    <i class="fa fa-bar-chart"></i> Báo Cáo Doanh Thu
-                </a>
+                <a href="#baoCaoSubmenu" data-toggle="collapse" aria-expanded="false" class="${active_tab == 'baocao' ? 'active-tab' : ''}">
+                                    <i class="fa fa-bar-chart"></i> Báo Cáo Doanh Thu
+                                    <i class="fa fa-caret-down float-right mt-1"></i> </a>
+                                <div class="collapse submenu" id="baoCaoSubmenu">
+                                    <a href="BaoCao" class="${active_tab == 'baocaongay' ? 'active-tab' : ''}">
+                                        <i class="fa fa-calendar"></i> Doanh thu
+                                    </a>
+                                </div>
             </c:if>
         </div>
 

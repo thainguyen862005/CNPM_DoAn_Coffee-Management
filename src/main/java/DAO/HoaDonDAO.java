@@ -300,7 +300,9 @@ public class HoaDonDAO {
 
     //Thanh toán hoá đơn, chuyển trạng thái, lưu hoá đơn
     public void thanhToanHoaDon(int orderId, int tableId) {
+        // [UC-20] Lưu hóa đơn: Chuẩn bị câu lệnh SQL đổi trạng thái sang 'Đã thanh toán'
         String sqlUpdateOrder = "UPDATE orders SET status = 'Đã thanh toán' WHERE order_id = ?";
+        // [UC-19] Cập nhật trạng thái bàn: Chuẩn bị câu lệnh SQL trả bàn về trạng thái 'Trống'
         String sqlUpdateTable = "UPDATE coffee_tables SET status = 'Trống' WHERE table_id = ?";
 
         try (Connection conn = DBUtil.getConnection()) {

@@ -37,12 +37,15 @@ public class HoaDonServlet extends HttpServlet {
         HoaDonDAO dao = new HoaDonDAO();
 
         if ("detail".equals(action)) {
+            // [UC-11] Bước 1: Servlet tiếp nhận request xem chi tiết hóa đơn từ giao diện
             String idParam = request.getParameter("id");
             if (idParam != null) {
                 int orderId = Integer.parseInt(idParam);
+                // [UC-11] Bước 2: Gọi DAO truy vấn Database để lấy thông tin chi tiết Order
                 Order order = dao.getOrderById(orderId);
                 request.setAttribute("order", order);
             }
+            // [UC-11] Bước 3: Đẩy dữ liệu (order) sang chi_tiet_hoa_don.jsp để render HTML
             request.getRequestDispatcher("/WEB-INF/views/chi_tiet_hoa_don.jsp").forward(request, response);
         }
         else if ("detail_by_table".equals(action)) {
@@ -88,13 +91,16 @@ public class HoaDonServlet extends HttpServlet {
                 UC-03 - Kiểm tra quyền thanh toán hóa đơn.
                 Cashier là tác nhân thực hiện nghiệp vụ thanh toán. Manager và Staff không được gửi trực tiếp action thanh_toan.
             */
+            // [UC-12] Bước 1: Tiếp nhận request thanh toán từ AJAX truyền lên
             if (!AuthUtil.checkRole(request, response, "Cashier")) {
                 return;
             }
 
             int orderId = Integer.parseInt(request.getParameter("orderId"));
             int tableId = Integer.parseInt(request.getParameter("tableId"));
+            // [UC-12] Bước 2: Gọi HoaDonDAO để xử lý nghiệp vụ lưu hóa đơn và dọn bàn
             dao.thanhToanHoaDon(orderId, tableId);
+            // [UC-12] Bước 3: Trả tín hiệu "success" về cho hàm Fetch API ở Front-end
             response.getWriter().write("success");
             return;
         }

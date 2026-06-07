@@ -67,6 +67,7 @@
             </tbody>
         </table>
 
+        <%-- [UC-18] Tính tổng tiền: Hệ thống gọi hàm calculateTotal() từ Model để cộng dồn thành tiền và hiển thị lên UI --%>
         <h5 class="text-danger text-end fw-bold">Tổng tiền: ${order.calculateTotal()} VNĐ</h5>
 
         <hr>

@@ -103,6 +103,47 @@ public class HoaDonDAO {
         return order;
     }
 
+    public List<DoanhThuNamDTO> layBaoCaoDoanhThuTheoNam() {
+        List<DoanhThuNamDTO> list = new ArrayList<>();
+
+        // Câu lệnh SQL tối ưu đã chuẩn bị trước đó
+        String sql = "WITH DoanhThuTheoNam AS ( " +
+                "    SELECT YEAR(o.order_date) AS nam, SUM(od.subtotal) AS tong_doanh_thu " +
+                "    FROM order_details od " +
+                "    JOIN orders o ON od.order_id = o.order_id " +
+                "    WHERE o.payment_status = N'Đã thanh toán' " +
+                "    GROUP BY YEAR(o.order_date) " +
+                "), " +
+                "XepHangMonAn AS ( " +
+                "    SELECT YEAR(o.order_date) AS nam, mi.item_name, " +
+                "    ROW_NUMBER() OVER (PARTITION BY YEAR(o.order_date) ORDER BY SUM(od.quantity) DESC) AS xep_hang " +
+                "    FROM order_details od " +
+                "    JOIN orders o ON od.order_id = o.order_id " +
+                "    JOIN menu_items mi ON od.item_id = mi.item_id " +
+                "    WHERE o.payment_status = N'Đã thanh toán' " +
+                "    GROUP BY YEAR(o.order_date), mi.item_name " +
+                ") " +
+                "SELECT dt.nam, dt.tong_doanh_thu, xh.item_name AS mon_ban_chay " +
+                "FROM DoanhThuTheoNam dt " +
+                "LEFT JOIN XepHangMonAn xh ON dt.nam = xh.nam AND xh.xep_hang = 1";
+
+        try (Connection conn = DBUtil.getConnection(); // Sử dụng lớp DBUtil có sẵn của bạn
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                int nam = rs.getInt("nam");
+                double tongDoanhThu = rs.getDouble("tong_doanh_thu");
+                String monBanChay = rs.getString("mon_ban_chay");
+
+                list.add(new DoanhThuNamDTO(nam, tongDoanhThu, monBanChay));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     // Hàm tạo hóa đơn mới
     public boolean createOrder(int tableId) {
         // Lệnh SQL: Thêm hóa đơn với thời gian hiện tại và trạng thái 'Đang phục vụ'
@@ -230,5 +271,21 @@ public class HoaDonDAO {
             System.out.println("Lỗi cập nhật bảng coffee_tables: " + e.getMessage());
             e.printStackTrace();
         }
+    }
+    // Thêm class này vào cuối file HoaDonDAO.java hoặc tạo file mới trong thư mục Model
+    public class DoanhThuNamDTO {
+        private int nam;
+        private double tongDoanhThu;
+        private String monBanChay;
+
+        public DoanhThuNamDTO(int nam, double tongDoanhThu, String monBanChay) {
+            this.nam = nam;
+            this.tongDoanhThu = tongDoanhThu;
+            this.monBanChay = monBanChay;
+        }
+        // Getter / Setter tương ứng nếu cần
+        public int getNam() { return nam; }
+        public double getTongDoanhThu() { return tongDoanhThu; }
+        public String getMonBanChay() { return monBanChay; }
     }
 }

@@ -69,7 +69,7 @@ public class HoaDonServlet extends HttpServlet {
             response.getWriter().write("success");
             return;
         }
-        // LUỒNG 1: TẠO HÓA ĐƠN MỚI
+        // [UC-05] MAIN FLOW: Tạo Order
         else if ("create".equals(action)) {
             // ĐIỀU KIỆN 1: PHÂN QUYỀN (ADMIN BỊ CHẶN - STAFF THÌ ĐƯỢC CHẠY TIẾP)
             jakarta.servlet.http.HttpSession session = request.getSession();
@@ -113,6 +113,7 @@ public class HoaDonServlet extends HttpServlet {
 
             response.sendRedirect("HoaDon");
         }
+        // [UC-06] MAIN FLOW: Cập nhật Order (Đổi bàn, Gọi thêm món)
         else if ("addMultipleItems".equals(action) || "update".equals(action)) {
             int orderId = Integer.parseInt(request.getParameter("orderId"));
 
@@ -146,6 +147,7 @@ public class HoaDonServlet extends HttpServlet {
             }
             response.sendRedirect("HoaDon");
         }
+        // [UC-06] MAIN FLOW: Xóa món trong Order
         else if ("removeMenuItem".equals(action)) {
             int orderId = Integer.parseInt(request.getParameter("orderId"));
             int itemId = Integer.parseInt(request.getParameter("itemId"));
@@ -153,7 +155,7 @@ public class HoaDonServlet extends HttpServlet {
             // Xóa món khỏi chi tiết hóa đơn
             dao.removeOrderDetail(orderId, itemId);
 
-            // Kịch bản xử lý thông minh: Kiểm tra nếu hóa đơn vừa xóa xong đã rỗng
+            // [UC-06] ALTERNATIVE FLOW 3C: Tự động xóa Order nếu order rỗng
             Model.Order orderAfterRemove = dao.getOrderById(orderId);
             if (orderAfterRemove != null && orderAfterRemove.getOrderDetails().isEmpty()) {
                 int tableId = dao.getTableIdByOrderId(orderId);

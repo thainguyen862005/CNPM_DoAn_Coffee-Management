@@ -1,5 +1,6 @@
 package Controller;
 
+import DAO.HoaDonDAO;
 import Util.AuthUtil;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -29,10 +30,26 @@ public class BaoCaoServlet extends HttpServlet {
             return;
         }
 
-        // Gửi tên file JSP ruột sang cho main_ui
+        // 1. Lấy giá trị bộ lọc từ combobox gửi lên (nếu không có thì mặc định là 'all')
+        String timeFilter = request.getParameter("timeFilter");
+        if (timeFilter == null || timeFilter.trim().isEmpty()) {
+            timeFilter = "all";
+        }
+
+        // 2. Gọi DAO truyền tham số thời gian vào để tính toán dữ liệu thu gọn
+        HoaDonDAO hoaDonDao = new HoaDonDAO();
+        int totalInvoices = hoaDonDao.getTotalInvoices(timeFilter);
+        double totalRevenue = hoaDonDao.getTotalRevenue(timeFilter);
+
+        // 3. Gửi số liệu báo cáo và giữ lại trạng thái combobox vừa chọn sang JSP
+        request.setAttribute("totalInvoices", totalInvoices);
+        request.setAttribute("totalRevenue", totalRevenue);
+        request.setAttribute("selectedFilter", timeFilter);
+
+        // Gửi thông tin cấu trúc giao diện chính main_ui
         request.setAttribute("page_content", "bao_cao.jsp");
-        // Gửi cờ active để làm sáng nút trên Sidebar
         request.setAttribute("active_tab", "baocao");
+
         request.getRequestDispatcher("/WEB-INF/views/main_ui.jsp").forward(request, response);
     }
 }

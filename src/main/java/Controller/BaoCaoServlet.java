@@ -20,9 +20,9 @@ public class BaoCaoServlet extends HttpServlet {
         String action = request.getParameter("action");
 
         if ("lay_du_lieu".equals(action)) {
-            // ==========================================
+            // 
             // TRƯỜNG HỢP 1: JS gọi xuống để lấy JSON
-            // ==========================================
+            // 
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
 
@@ -44,9 +44,9 @@ public class BaoCaoServlet extends HttpServlet {
             out.flush();
 
         } else {
-            // ==========================================
+            // 
             // TRƯỜNG HỢP 2: Người dùng bấm vào Menu để xem trang HTML
-            // ==========================================
+            // 
             // Set tab đang active để Menu sáng lên
             request.setAttribute("active_tab", "baocaongay");
 
